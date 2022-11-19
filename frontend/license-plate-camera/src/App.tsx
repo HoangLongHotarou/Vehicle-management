@@ -1,0 +1,20 @@
+import {Link} from "react-router-dom"
+import './App.css';
+
+
+export default function App(){
+    return (
+        <div>
+            <h1>test</h1>
+            <nav
+                    style={{
+                    borderBottom: "solid 1px",
+                    paddingBottom: "1rem",
+                    }}
+                >
+                <Link to="/region">Region</Link>
+                <Link to="/test">Test</Link>
+            </nav>
+        </div>
+    )
+}

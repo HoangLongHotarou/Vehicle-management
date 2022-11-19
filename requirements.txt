@@ -1,0 +1,173 @@
+absl-py==1.3.0
+aiohttp==3.8.3
+aioredis==2.0.1
+aiosignal==1.2.0
+aiosmtplib==1.1.6
+amqp==5.1.1
+anyio==3.6.1
+argon2-cffi @ file:///opt/conda/conda-bld/argon2-cffi_1645000214183/work
+argon2-cffi-bindings @ file:///tmp/build/80754af9/argon2-cffi-bindings_1644569679365/work
+asgiref==3.5.2
+asttokens==2.0.8
+async-timeout==4.0.2
+asyncio==3.4.3
+attrs==22.1.0
+autopep8 @ file:///opt/conda/conda-bld/autopep8_1650463822033/work
+backcall @ file:///home/ktietz/src/ci/backcall_1611930011877/work
+bcrypt==3.2.2
+beautifulsoup4 @ file:///opt/conda/conda-bld/beautifulsoup4_1650462163268/work
+billiard==3.6.4.0
+bleach @ file:///opt/conda/conda-bld/bleach_1641577558959/work
+blinker==1.5
+cachetools==5.2.0
+celery==5.2.7
+certifi==2022.6.15
+cffi @ file:///tmp/abs_98z5h56wf8/croots/recipe/cffi_1659598650955/work
+charset-normalizer==2.1.0
+click==8.1.3
+click-didyoumean==0.3.0
+click-plugins==1.1.1
+click-repl==0.2.0
+cloudinary==1.30.0
+colorama==0.4.5
+coloredlogs==15.0.1
+commonmark==0.9.1
+contourpy==1.0.6
+cycler==0.11.0
+debugpy @ file:///tmp/build/80754af9/debugpy_1637091799509/work
+decorator @ file:///opt/conda/conda-bld/decorator_1643638310831/work
+defusedxml @ file:///tmp/build/80754af9/defusedxml_1615228127516/work
+Deprecated==1.2.13
+distlib==0.3.6
+dnspython==2.2.1
+ecdsa==0.18.0
+email-validator==1.2.1
+entrypoints @ file:///tmp/build/80754af9/entrypoints_1649926439650/work
+executing==0.10.0
+fastapi==0.79.0
+fastapi-mail==1.1.4
+fastjsonschema @ file:///opt/conda/conda-bld/python-fastjsonschema_1661371079312/work
+filelock==3.8.0
+flatbuffers==22.10.26
+fonttools==4.37.1
+frozenlist==1.3.1
+google-auth==2.14.1
+google-auth-oauthlib==0.4.6
+grpcio==1.50.0
+h11==0.12.0
+httpcore==0.15.0
+httptools==0.4.0
+httpx==0.23.0
+humanfriendly==10.0
+idna @ file:///croot/idna_1666125576474/work
+importlib-metadata==5.0.0
+imutils==0.5.4
+ipykernel @ file:///opt/conda/conda-bld/ipykernel_1662361798230/work
+ipython @ file:///croot/ipython_1668088122043/work
+ipython-genutils @ file:///tmp/build/80754af9/ipython_genutils_1606773439826/work
+itsdangerous==2.1.2
+jedi @ file:///tmp/build/80754af9/jedi_1644297102865/work
+Jinja2 @ file:///croot/jinja2_1666908132255/work
+jsonschema @ file:///opt/conda/conda-bld/jsonschema_1663375472438/work
+jupyter-server @ file:///tmp/abs_b88b31b8-83b9-476d-a46d-e563c421f38fvsnyi1ur/croots/recipe/jupyter_server_1658754481507/work
+jupyter_client @ file:///opt/conda/conda-bld/jupyter_client_1662504365333/work
+jupyter_core @ file:///croot/jupyter_core_1668084443243/work
+jupyterlab-pygments @ file:///tmp/build/80754af9/jupyterlab_pygments_1601490720602/work
+kiwisolver==1.4.4
+kombu==5.2.4
+Markdown==3.4.1
+MarkupSafe @ file:///opt/conda/conda-bld/markupsafe_1654597864307/work
+matplotlib==3.5.3
+matplotlib-inline @ file:///opt/conda/conda-bld/matplotlib-inline_1662014470464/work
+mistune @ file:///tmp/build/80754af9/mistune_1607364877025/work
+motor==3.1.1
+mpmath==1.2.1
+multidict==6.0.2
+nbclassic @ file:///croot/nbclassic_1668174957779/work
+nbclient @ file:///tmp/build/80754af9/nbclient_1650290509967/work
+nbconvert @ file:///opt/conda/conda-bld/nbconvert_1649751911790/work
+nbformat @ file:///opt/conda/conda-bld/nbformat_1663744952973/work
+nest-asyncio @ file:///tmp/build/80754af9/nest-asyncio_1649847906199/work
+notebook @ file:///croot/notebook_1668179881751/work
+notebook_shim @ file:///croot/notebook-shim_1668160579331/work
+numpy==1.23.2
+oauthlib==3.2.2
+onnx==1.12.0
+onnx-simplifier==0.4.9
+onnxruntime==1.13.1
+opencv-python==4.6.0.66
+orjson==3.7.7
+packaging @ file:///tmp/build/80754af9/packaging_1637314298585/work
+pandas==1.4.3
+pandocfilters @ file:///opt/conda/conda-bld/pandocfilters_1643405455980/work
+parso @ file:///opt/conda/conda-bld/parso_1641458642106/work
+passlib==1.7.4
+pexpect @ file:///tmp/build/80754af9/pexpect_1605563209008/work
+pickleshare @ file:///tmp/build/80754af9/pickleshare_1606932040724/work
+Pillow==9.2.0
+platformdirs==2.5.2
+prometheus-client @ file:///tmp/abs_d3zeliano1/croots/recipe/prometheus_client_1659455100375/work
+prompt-toolkit==3.0.30
+protobuf==3.20.1
+psutil==5.9.1
+ptyprocess @ file:///tmp/build/80754af9/ptyprocess_1609355006118/work/dist/ptyprocess-0.7.0-py2.py3-none-any.whl
+pure-eval @ file:///opt/conda/conda-bld/pure_eval_1646925070566/work
+pyasn1==0.4.8
+pyasn1-modules==0.2.8
+pycodestyle @ file:///tmp/build/80754af9/pycodestyle_1636635402688/work
+pycparser @ file:///tmp/build/80754af9/pycparser_1636541352034/work
+pydantic==1.9.1
+Pygments==2.13.0
+PyJWT==2.4.0
+pymongo==4.3.2
+pyparsing @ file:///opt/conda/conda-bld/pyparsing_1661452539315/work
+pyrsistent @ file:///tmp/build/80754af9/pyrsistent_1636110951836/work
+python-dateutil @ file:///tmp/build/80754af9/python-dateutil_1626374649649/work
+python-dotenv==0.20.0
+python-jose==3.3.0
+python-multipart==0.0.5
+pytz==2022.1
+PyYAML==6.0
+pyzmq @ file:///opt/conda/conda-bld/pyzmq_1657724186960/work
+redis==4.3.4
+requests==2.28.1
+requests-oauthlib==1.3.1
+rfc3986==1.5.0
+rich==12.6.0
+rsa==4.9
+scipy==1.9.1
+seaborn==0.11.2
+Send2Trash @ file:///tmp/build/80754af9/send2trash_1632406701022/work
+six @ file:///tmp/build/80754af9/six_1644875935023/work
+sniffio @ file:///tmp/build/80754af9/sniffio_1614030464178/work
+soupsieve @ file:///croot/soupsieve_1666296392845/work
+stack-data==0.5.0
+starlette==0.19.1
+sympy==1.11.1
+tensorboard==2.11.0
+tensorboard-data-server==0.6.1
+tensorboard-plugin-wit==1.8.1
+terminado @ file:///tmp/build/80754af9/terminado_1644322582718/work
+testpath @ file:///opt/conda/conda-bld/testpath_1655908557405/work
+toml @ file:///tmp/build/80754af9/toml_1616166611790/work
+torch==1.13.0+cpu
+torchaudio==0.13.0+cpu
+torchvision==0.14.0+cpu
+tornado @ file:///opt/conda/conda-bld/tornado_1662061693373/work
+tqdm==4.64.0
+traitlets==5.3.0
+typing_extensions @ file:///tmp/abs_ben9emwtky/croots/recipe/typing_extensions_1659638822008/work
+ujson==5.4.0
+urllib3==1.26.10
+uvicorn==0.17.6
+vine==5.0.0
+virtualenv==20.16.6
+watchgod==0.8.2
+wcwidth @ file:///Users/ktietz/demo/mc3/conda-bld/wcwidth_1629357192024/work
+webencodings==0.5.1
+websocket-client @ file:///tmp/build/80754af9/websocket-client_1614803975924/work
+websockets==10.3
+Werkzeug==2.2.2
+wrapt==1.14.1
+yarl==1.8.1
+zipp==3.10.0
