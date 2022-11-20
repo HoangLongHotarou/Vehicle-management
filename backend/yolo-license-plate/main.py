@@ -7,7 +7,7 @@ from fastapi import FastAPI, File, APIRouter
 from fastapi.responses import FileResponse, Response, StreamingResponse
 from PIL import Image
 from fastapi.middleware.cors import CORSMiddleware
-from ONNXModel.processing import processing
+# from ONNXModel.processing import processing
 from yolo_function.yoloV7.processing import YOLOV7Processing
 # from yolo_function.yoloV5.processing import YOLOV5Processing
 
@@ -34,7 +34,7 @@ app.add_middleware(
 
 router = APIRouter(prefix='/api/v1/yolo-license-plate',responses={'404':{'description':'Not found test'}})
 
-@router.post('/images/detect1')
+@router.post('/images/detect')
 async def detect_image(file:bytes = File()):
     test = YOLOV7Processing()
     img = Image.open(io.BytesIO(file))
@@ -46,14 +46,14 @@ async def detect_image(file:bytes = File()):
     return {"list":labels,"time":end-start}
 
 
-@router.post('/images/detect')
-async def detect_image(file:bytes = File()):
-    img = Image.open(io.BytesIO(file))
-    image = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
-    start = time.time()
-    labels = processing(image)
-    end = time.time()
-    return {"list":labels,"time":end-start}
+# @router.post('/images/detect')
+# async def detect_image(file:bytes = File()):
+#     img = Image.open(io.BytesIO(file))
+#     image = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
+#     start = time.time()
+#     labels = processing(image)
+#     end = time.time()
+#     return {"list":labels,"time":end-start}
 
 
 @router.post('/images/predict')
