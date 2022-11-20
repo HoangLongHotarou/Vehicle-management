@@ -3,10 +3,10 @@ from ONNXModel.func.function import *
 from ONNXModel.baseONNX.onnxv7 import YOLOv7Detect, YOLOv7Recognize
 from ONNXModel.baseONNX.onnxv5 import YOLOv5Detect,YOLOv5Recognize
 
-detect = YOLOv7Detect(cuda=True)
+detect = YOLOv7Detect()
 # detect = YOLOv5Detect()
-recog = YOLOv5Recognize(cuda=True)
-# recog = YOLOv7Recognize(cuda=True)
+# recog = YOLOv5Recognize(cuda=True)
+recog = YOLOv7Recognize()
 
 def processing(image):
     img = image

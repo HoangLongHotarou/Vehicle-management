@@ -11,7 +11,7 @@ class YoloV7Detect(BaseDetect):
 
 class YoloV7Recognize(BaseRecognize):
     def __init__(self):
-        super().__init__('WongKinYiu/yolov7', 'pt_folder/yolov7_tiny/recog_best.pt')
+        super().__init__('WongKinYiu/yolov7', 'pt_folder/yolov7_tiny/recognize_best.pt')
 
 class YOLOV7Processing(BaseProcessing):
     def __init__(self):
