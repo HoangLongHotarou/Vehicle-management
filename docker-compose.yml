@@ -32,8 +32,9 @@ services:
       - ./env/license-plate-app.env
     ports:
       - '8003:8000'
-    # depends_on:
-    #   - redis
+    depends_on:
+      - auth_service
+      - ai_service
   # check_vehicle_service:
   #   build:
   #     context: .
