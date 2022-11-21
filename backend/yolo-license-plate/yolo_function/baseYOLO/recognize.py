@@ -25,7 +25,7 @@ class BaseRecognize(BaseLicensePlateYOLO):
         above = {}
         under = {}
         for coordinates in coordinates_matrix:
-            # if float(coordinates[4]<0.8): return None
+            if float(coordinates[4]<0.5): continue
             if abs(coordinates[1]-track) < 12:
                 above[coordinates[0]] = (float(coordinates[4]),int(coordinates[5]))
             else:
