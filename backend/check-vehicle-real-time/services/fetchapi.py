@@ -26,7 +26,7 @@ class FetchVehicleManager(metaclass=SingletonMeta):
     
     async def check_turn_in_out(self,data):
         async with aiohttp.ClientSession() as session:
-            async with session.post(f'{self.url}/in_and_out/check_turn_in_out',json=data) as response:
+            async with session.post(f'{self.url}/in_and_out/check_turn_in_out_realtime',json=data) as response:
                 if response.status==200:
                     return await response.json()
                 raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail='network bad request')

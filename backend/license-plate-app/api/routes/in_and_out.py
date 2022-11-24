@@ -42,19 +42,30 @@ async def turn_in_out(
     )
     return data
 
-@router.post('/check_turn_in_out')
-async def check_turn_in_out(
-    task: BackgroundTasks,
+# @router.post('/check_turn_in_out')
+# async def check_turn_in_out(
+#     task: BackgroundTasks,
+#     check: CheckInAndOutSchema
+# ):
+#     check = check.dict()
+#     data = await inAndOutCtrl.check_vehicle(
+#         check['plates'],
+#         check['id_region'],
+#         check['turn'],
+#         check['vehicle_type'],
+#         task
+#     )
+#     return data
+
+@router.post('/check_turn_in_out_realtime')
+async def check_turn_in_out_realtime(
     check: CheckInAndOutSchema
 ):
     check = check.dict()
-    data = await inAndOutCtrl.check_vehicle(
-        check['plates'],
-        check['id_region'],
-        check['turn'],
-        check['vehicle_type'],
-        task
-    )
+    data = await inAndOutCtrl.check_vehicle_realtime(
+        plates_json=check['plates'], 
+        id_region=check['id_region'], 
+        turn=check['turn'])
     return data
 
 class SortDates(str, Enum):

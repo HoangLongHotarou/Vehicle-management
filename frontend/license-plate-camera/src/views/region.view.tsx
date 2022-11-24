@@ -19,10 +19,10 @@ export default function RegionView() {
   var [regions, setRegions] = useState<Region[]>([]);
   var [cameras, setCameras] = useState<RTSPCamera[]>([]);
   var [value, setValue] = useState<string>('');
-  var [plates, setPlates] = useState<LicensePlate[]>([]);
+  var [plate, setplate] = useState<LicensePlate>();
 
   useEffect(()=>{
-    BaseWebSocketAPI.Instance.receiveDataUseState(setPlates);
+    BaseWebSocketAPI.Instance.receiveDataUseState(setplate);
     // BaseWebSocketAPI.Instance.receiveData();
   },[])
 
@@ -39,7 +39,6 @@ export default function RegionView() {
     })
     setValue(event.target.value)
     fetchInAndOut.get_rtsp(event.target.value).then((res) => {
-      console.log(`test ${res}`)
       setCameras(res);
     })
   }
@@ -64,9 +63,9 @@ export default function RegionView() {
       </FormControl>
       <pre className="section">{JSON.stringify(cameras, null, ' ')}</pre>
       {/* {console.log(cameras)} */}
-      {/* <pre className="section">{JSON.stringify(plates,null,' ')}</pre>*/}
+      {/* <pre className="section">{JSON.stringify(plate,null,' ')}</pre>*/}
       {cameras === undefined ? (<>not camera</>) : (cameras.map((camera, i) => (
-        <ShowCamera url={camera['rtsp_url']} license_plates={plates} />
+        <ShowCamera url={camera['rtsp_url']} data={plate} type={camera['type']} />
       )))}
     </>
   );

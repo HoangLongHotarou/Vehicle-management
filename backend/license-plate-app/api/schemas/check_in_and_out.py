@@ -22,4 +22,3 @@ class CheckInAndOutSchema(BaseModel):
     plates: Optional[List[PlateSchema]]
     id_region: Optional[PyObjectId]
     turn: Optional[Type]
-    vehicle_type: Optional[VehicleType]

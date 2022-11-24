@@ -1,26 +1,30 @@
+import { useEffect, useState } from "react";
 import { LicensePlate } from "../../interfaces/license-plate";
+import './show-camera.css'
 
 interface ShowCameraProps{
     url: string;
-    license_plates: LicensePlate[] 
+    data?: LicensePlate;
+    type: string;
 }
 
 export default function ShowCamera(props: ShowCameraProps){
-    var {url,license_plates} = props;
+    var {url,data,type} = props;
+
+    var [info, setInfo] = useState<LicensePlate>(); 
+
+    useEffect(()=>{
+        if(data&&type===data.turn){
+            setInfo(data)
+        }
+    },[data])
 
     return(
-    <>
-        <img src={url} width="50%"/>
-        {/* <ul>
-            {license_plates===undefined?(<>Not plates</>):(license_plates.map((plate,i)=>(
-                <li>
-                    {plate.plate}
-                </li>
-            )))}
-        </ul> */}
-        {/* {url}    */}
-        {/* {console.log(typeof license_plates)} */}
-        <pre className="section">{JSON.stringify(license_plates, null, ' ')}</pre>
-    </>
+        <>
+            <div className='test'>
+                <img src={url} width="40%"/>
+                <pre className="section">{JSON.stringify(info, null, ' ')}</pre>
+            </div>
+        </>
     );
 }

@@ -91,6 +91,83 @@ class VehicleCrud(BaseCrud):
             if data['user_id'] != None:
                 ids_user.append(str(data['user_id']))
         return list,ids_user
+    
+    # async def filter_detail_vehicle(self,plates,date):
+    #     pipeline=[
+    #         {
+    #             '$match':{
+    #                 'plate':{
+    #                     "$in":plates
+    #                 }
+    #             }
+    #         },
+    #         {
+    #             '$lookup':{
+    #                 'from':'license_plate_in_and_out',
+    #                 'localField':'_id',
+    #                 'foreignField':'id_vehicle',
+    #                 'as':'in_and_out',
+    #                 'pipeline':[
+    #                     {
+    #                         '$lookup':{
+    #                             'from':'license_plate_region',
+    #                             'localField': 'id_region',
+    #                             'foreignField': '_id',
+    #                             'as':'region',
+    #                             'pipeline': [
+    #                                 {
+    #                                     '$project':{
+    #                                         'type':0,
+    #                                         'coordinate':0,
+    #                                         'acceptance_roles':0,
+    #                                         'cameras':0
+    #                                     }
+    #                                 }
+    #                             ]
+    #                         }
+    #                     },
+    #                     {
+    #                         '$unwind':'$region'
+    #                     },
+    #                     {
+    #                         '$lookup':{
+    #                             'from':'license_plate_in_and_out_time',
+    #                             'localField':'_id',
+    #                             'foreignField':'id_in_and_out',
+    #                             'as':'in_and_out_time',
+    #                             'pipeline':[
+    #                                 {
+    #                                     '$match':{'date':date}
+    #                                 },
+    #                             ]
+    #                         },
+    #                     },
+    #                     {
+    #                         '$unwind':{
+    #                             'path':'$in_and_out_time',
+    #                             'preserveNullAndEmptyArrays':True
+    #                         }
+    #                     }
+    #                 ]
+    #             }
+    #         },
+    #         {
+    #             '$unwind':{
+    #                 'path':'$in_and_out',
+    #                 'preserveNullAndEmptyArrays':True
+    #             }
+    #         }
+    #     ]
+    #     result = self.db.mongodb[self.model].aggregate(pipeline)
+    #     list = []
+    #     ids_user = []
+    #     async for data in result:
+    #         list.append(data)
+    #         if data['user_id'] != None:
+    #             ids_user.append(str(data['user_id']))
+    #     return list,ids_user
+    
+    
 
 class RegionCrud(BaseCrud):
     def __init__(self):

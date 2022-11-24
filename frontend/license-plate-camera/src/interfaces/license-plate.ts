@@ -1,3 +1,5 @@
 export interface LicensePlate{
-    plate: string;
+    register: [];
+    not_registered:[]; 
+    turn: string;
 }

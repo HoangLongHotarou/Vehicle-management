@@ -3,6 +3,7 @@ import base64
 import concurrent.futures
 import threading
 import time
+from multiprocessing.pool import ThreadPool
 
 import cv2
 # from api.controllers.region import RegionController
@@ -19,6 +20,7 @@ except:
         from thread import get_ident
     except ImportError:
         from _thread import get_ident
+
 
 class CameraEvent(object):
     def __init__(self):
@@ -56,7 +58,7 @@ class BaseCamera:
     def __init__(self):
         if self.thread is None:
             self.last_access = time.time()
-            self.thread = threading.Thread(target=self._thread)
+            self.thread = threading.Thread(target=self._thread,daemon=True)
             self.thread.start()
             while self.get_frame() is None:
                 time.sleep(0)
@@ -93,36 +95,47 @@ class CameraStream(BaseCamera):
         self.fetchYoloAPI = FetchYoloAPI()
         self.fetchVehicleManager = FetchVehicleManager()
         self.task = task
-        
+        self.plates = []
+        self.data_obj = {}
         super().__init__()
+
+    def fetchDetect(self,img):
+        _, im_arr = cv2.imencode('.jpg', img)
+        im_bytes = im_arr.tobytes()
+        image = base64.b64encode(im_bytes)
+        self.plates = asyncio.run(self.fetchYoloAPI.predict(image))
 
     def useAI(self,img):
         _, im_arr = cv2.imencode('.jpg', img)
         im_bytes = im_arr.tobytes()
         image = base64.b64encode(im_bytes)
         
-        plates = asyncio.run(self.fetchYoloAPI.predict(image))
+        self.plates = asyncio.run(self.fetchYoloAPI.predict(image))
         
-        if plates == [] or plates == None:
+        if self.plates == [] or self.plates == None:
             return
         
         object = {
-            'plates': plates,
+            'plates': self.plates,
             'id_region': str(self.id_region),
             'turn': self.turn,
-            'vehicle_type': 'motorcycle'
         }
         # data =object
         data = asyncio.run(
             self.fetchVehicleManager.check_turn_in_out(object)
         )
-        print(data)
+        
+        self.data_obj = data
+        # data = asyncio.run(
+        #     self.fetchVehicleManager.get_region(self.id_region)
+        # )
         if data != []:
             asyncio.run(self.manager.broadcast(data,self.id_region))
 
     def frames(self)->any:
         frame = cv2.VideoCapture(self.src)
         count = 0
+        plates = []
         try:
             while True:
                 success, img = frame.read()
@@ -130,10 +143,67 @@ class CameraStream(BaseCamera):
                     print('cannot connect camera')
                     break
                 count += 1
-                if count%50==0: 
+                if count%60==0: 
                     count=0
                     thread = threading.Thread(target=self.useAI,args=(img,))
                     thread.start()
+                    # pool = ThreadPool(processes=1)
+                    # async_result = pool.apply_async(self.fetchDetect,(img,))
+                    # img = async_result.get()
+                    # with concurrent.futures.ThreadPoolExecutor() as executor:
+                    #     future = executor.submit(self.fetchDetect,img)
+                    #     plates = future.result()
+                # register = self.data_obj.get('register',[])
+                # unregister = self.data_obj.get('not_registered',[])
+                # for re in register:
+                #     x0 = re['coordinate']['x0']
+                #     y0 = re['coordinate']['y0']
+                #     x1 = re['coordinate']['x1']
+                #     y1 = re['coordinate']['y1']
+                #     cv2.rectangle(img, (int(x0), int(y0)), (int(x1), int(y1)), (255, 0, 0), 2)
+                #     image = cv2.putText(
+                #         img, 
+                #         re['username'], 
+                #         (int(x0)-10, int(y0)-10), 
+                #         cv2.FONT_HERSHEY_SIMPLEX, 
+                #         1, 
+                #         (255, 0, 0), 
+                #         2, 
+                #         cv2.LINE_AA
+                #     )
+                # for re in unregister:
+                #     x0 = re['coordinate']['x0']
+                #     y0 = re['coordinate']['y0']
+                #     x1 = re['coordinate']['x1']
+                #     y1 = re['coordinate']['y1']
+                #     cv2.rectangle(img, (int(x0), int(y0)), (int(x1), int(y1)), (0, 0, 255), 2)
+                #     image = cv2.putText(
+                #         img, 
+                #         "Unknown", 
+                #         (int(x0)-10, int(y0)-10), 
+                #         cv2.FONT_HERSHEY_SIMPLEX, 
+                #         1, 
+                #         (0, 0, 255), 
+                #         2, 
+                #         cv2.LINE_AA
+                #     )
+
+                for plate in self.plates:
+                    x0 = plate['coordinate']['x0']
+                    y0 = plate['coordinate']['y0']
+                    x1 = plate['coordinate']['x1']
+                    y1 = plate['coordinate']['y1']
+                    cv2.rectangle(img, (int(x0), int(y0)), (int(x1), int(y1)), (255, 0, 0), 2)
+                    image = cv2.putText(
+                        img, 
+                        plate['plate'], 
+                        (int(x0)-10, int(y0)-10), 
+                        cv2.FONT_HERSHEY_SIMPLEX, 
+                        1, 
+                        (255, 0, 0), 
+                        2, 
+                        cv2.LINE_AA
+                    )
                 yield cv2.imencode('.jpg', img)[1].tobytes()
         except Exception as e:
             print(e)
