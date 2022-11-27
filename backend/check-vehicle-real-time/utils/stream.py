@@ -153,50 +153,17 @@ class CameraStream(BaseCamera):
                     # with concurrent.futures.ThreadPoolExecutor() as executor:
                     #     future = executor.submit(self.fetchDetect,img)
                     #     plates = future.result()
-                # register = self.data_obj.get('register',[])
-                # unregister = self.data_obj.get('not_registered',[])
-                # for re in register:
-                #     x0 = re['coordinate']['x0']
-                #     y0 = re['coordinate']['y0']
-                #     x1 = re['coordinate']['x1']
-                #     y1 = re['coordinate']['y1']
-                #     cv2.rectangle(img, (int(x0), int(y0)), (int(x1), int(y1)), (255, 0, 0), 2)
-                #     image = cv2.putText(
-                #         img, 
-                #         re['username'], 
-                #         (int(x0)-10, int(y0)-10), 
-                #         cv2.FONT_HERSHEY_SIMPLEX, 
-                #         1, 
-                #         (255, 0, 0), 
-                #         2, 
-                #         cv2.LINE_AA
-                #     )
-                # for re in unregister:
-                #     x0 = re['coordinate']['x0']
-                #     y0 = re['coordinate']['y0']
-                #     x1 = re['coordinate']['x1']
-                #     y1 = re['coordinate']['y1']
-                #     cv2.rectangle(img, (int(x0), int(y0)), (int(x1), int(y1)), (0, 0, 255), 2)
-                #     image = cv2.putText(
-                #         img, 
-                #         "Unknown", 
-                #         (int(x0)-10, int(y0)-10), 
-                #         cv2.FONT_HERSHEY_SIMPLEX, 
-                #         1, 
-                #         (0, 0, 255), 
-                #         2, 
-                #         cv2.LINE_AA
-                #     )
-
-                for plate in self.plates:
-                    x0 = plate['coordinate']['x0']
-                    y0 = plate['coordinate']['y0']
-                    x1 = plate['coordinate']['x1']
-                    y1 = plate['coordinate']['y1']
+                register = self.data_obj.get('register',[])
+                unregister = self.data_obj.get('not_registered',[])
+                for re in register:
+                    x0 = re['coordinate']['x0']
+                    y0 = re['coordinate']['y0']
+                    x1 = re['coordinate']['x1']
+                    y1 = re['coordinate']['y1']
                     cv2.rectangle(img, (int(x0), int(y0)), (int(x1), int(y1)), (255, 0, 0), 2)
                     image = cv2.putText(
                         img, 
-                        plate['plate'], 
+                        re['username'], 
                         (int(x0)-10, int(y0)-10), 
                         cv2.FONT_HERSHEY_SIMPLEX, 
                         1, 
@@ -204,6 +171,39 @@ class CameraStream(BaseCamera):
                         2, 
                         cv2.LINE_AA
                     )
+                for re in unregister:
+                    x0 = re['coordinate']['x0']
+                    y0 = re['coordinate']['y0']
+                    x1 = re['coordinate']['x1']
+                    y1 = re['coordinate']['y1']
+                    cv2.rectangle(img, (int(x0), int(y0)), (int(x1), int(y1)), (0, 0, 255), 2)
+                    image = cv2.putText(
+                        img, 
+                        "Unknown", 
+                        (int(x0)-10, int(y0)-10), 
+                        cv2.FONT_HERSHEY_SIMPLEX, 
+                        1, 
+                        (0, 0, 255), 
+                        2, 
+                        cv2.LINE_AA
+                    )
+
+                # for plate in self.plates:
+                #     x0 = plate['coordinate']['x0']
+                #     y0 = plate['coordinate']['y0']
+                #     x1 = plate['coordinate']['x1']
+                #     y1 = plate['coordinate']['y1']
+                #     cv2.rectangle(img, (int(x0), int(y0)), (int(x1), int(y1)), (255, 0, 0), 2)
+                #     image = cv2.putText(
+                #         img, 
+                #         plate['plate'], 
+                #         (int(x0)-10, int(y0)-10), 
+                #         cv2.FONT_HERSHEY_SIMPLEX, 
+                #         1, 
+                #         (255, 0, 0), 
+                #         2, 
+                #         cv2.LINE_AA
+                #     )
                 yield cv2.imencode('.jpg', img)[1].tobytes()
         except Exception as e:
             print(e)
