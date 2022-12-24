@@ -57,6 +57,41 @@ class InAndOutController(metaclass=SingletonMeta):
                     ids.append(PyObjectId(in_and_out['_id']))
         return ids,add_in_and_out,in_and_out_time_ids,ids_vehicle_has_been_turn
     
+    async def _preprocessing_data_v2(self,turn,data_list,id_region,date):
+        add_in_and_out = []
+        vehicle_has_been_turn = {}
+        in_and_out_time_ids = []
+        ids = []
+        for data in data_list:
+            in_and_out = data.get('in_and_out')
+            if in_and_out == None:
+                add_in_and_out.append(
+                    {
+                        'id_vehicle':PyObjectId(data.get('_id')),
+                        'id_region':PyObjectId(id_region)
+                    }
+                )
+            else:
+                in_and_out_time = in_and_out.get('in_and_out_time',None)
+                if in_and_out_time != None:
+                    if(
+                        len(in_and_out_time['times'])>0 and
+                        in_and_out_time['times'][-1]['type'] == turn
+                    ):
+                        vehicle_has_been_turn[data['_id']] = {
+                                'date':in_and_out_time['date'],
+                                'time': in_and_out_time['times'][-1]['time']
+                            }
+                        continue
+                    if in_and_out_time['date'] == date:
+                        in_and_out_time_ids.append(in_and_out_time['_id'])
+                    else:
+                        ids.append(PyObjectId(in_and_out['_id']))
+                else:
+                    ids.append(PyObjectId(in_and_out['_id']))
+        return ids,add_in_and_out,in_and_out_time_ids,vehicle_has_been_turn
+    
+    
     async def _dotting_in_and_out(
         self,
         date,
@@ -219,34 +254,32 @@ class InAndOutController(metaclass=SingletonMeta):
         return {"register":vehicle_information,"not_registered":unknown_plates,"turn":turn}
     
     async def check_vehicle_realtime_v2(self,plates_json,id_region,turn):
+        vehicle_information = []
+        role_plates = {}
+        unknown_plates = []
+
         date = datetime.now(tz)
         if plates_json == []:
             return []
-        plates =[plate['plate'] for plate in plates_json] 
+        plates = [plate['plate'] for plate in plates_json] 
         
-        # filter all role of user
-        info_plate = await self.vehicleCrud.filter_role_access(plates, id_region)
-        
-        role_plates = {}
-        
-        for dict in info_plate:
-            role_plates[dict['plate']] = dict['entrance_auth_user']['entrance_auth']['name']
-        
-        # filter vehicle is accessed in today
-        data_list,ids_user = await self.vehicleCrud.filter_detail_vehicle_v2(role_plates.keys(),id_region,str(date.date()))
         dict_plates = {}
         for plate in plates_json:
             dict_plates[plate['plate']] = plate['coordinate']
         
-        # Get user list
-        users = await self.fetchAuth.get_user_list(ids_user)
-        ids_names = {}
-        for user in users:
-            ids_names[PyObjectId(user['_id'])]=user['username']
-        current_plates = [data['plate'] for data in data_list]       
-        unknown_plates = []
+        # filter all role of user
+        info_plate = await self.vehicleCrud.filter_role_access(plates, id_region)
+        
+        for dict in info_plate:
+            if dict['plate'] not in role_plates:
+                role_plates[dict['plate']] = [dict['entrance_auth_user']['entrance_auth']['name']]
+            else:
+                role_plates[dict['plate']].append(dict['entrance_auth_user']['entrance_auth']['name'])
+        
+        # print(role_plates.keys()==[])
+        
         for plate in plates:
-            if plate not in current_plates:
+            if plate not in list(role_plates.keys()):
                 object = {
                     'plate': plate,
                     'coordinate': dict_plates[plate],
@@ -254,31 +287,48 @@ class InAndOutController(metaclass=SingletonMeta):
                 }
                 unknown_plates.append(object) 
         
-        # preprocessing data
-        ids,add_in_and_out,in_and_out_time_ids,ids_vehicle_has_been_turn = await self._preprocessing_data(
-            turn=turn,
-            data_list=data_list,
-            id_region=id_region
-        )
-        
-        await self._dotting_in_and_out(date,turn,ids,add_in_and_out,in_and_out_time_ids)
-        vehicle_information = []
-        for data in data_list:
-            info = ''
-            if data['_id'] not in ids_vehicle_has_been_turn:
-                info = {
-                    'date': str(date.date()),
-                    'time': str(date.time())
-                }
-            else:
-                info = f"already {turn}"
-            object = { 
-                'username':ids_names.get(data['user_id'],'unknown'),
-                'plate':data['plate'],
-                'coordinate': dict_plates[data['plate']],
-                'information': info,
-            } 
-            vehicle_information.append(object)
+        if role_plates != {}:
+            # filter vehicle is accessed in today
+            data_list,ids_user = await self.vehicleCrud.filter_detail_vehicle_v2(list(role_plates.keys()),id_region,str(date.date()))
+            
+            # Get user list
+            users = await self.fetchAuth.get_user_list(ids_user)
+            ids_names = {}
+            for user in users:
+                ids_names[PyObjectId(user['_id'])]=user['username']
+            current_plates = [data['plate'] for data in data_list]       
+            
+            # preprocessing data
+            ids,add_in_and_out,in_and_out_time_ids, vehicle_has_been_turn = await self._preprocessing_data_v2(
+                turn=turn,
+                data_list=data_list,
+                id_region=id_region,
+                date = str(date.date())
+            )
+            
+            await self._dotting_in_and_out(date,turn,ids,add_in_and_out,in_and_out_time_ids)
+            for data in data_list:
+                info = ''
+                if data['_id'] not in vehicle_has_been_turn.keys():
+                    info = {
+                        'message': f'turn {turn}',
+                        'date': str(date.date()),
+                        'time': str(date.time())
+                    }
+                else:
+                    info = {
+                        'message': f"already {turn}",
+                        'date': vehicle_has_been_turn[data['_id']]['date'],
+                        'time': vehicle_has_been_turn[data['_id']]['time']
+                    }
+                object = { 
+                    'username':ids_names.get(data['user_id'],'unknown'),
+                    'plate':data['plate'],
+                    'role': role_plates[data['plate']],
+                    'coordinate': dict_plates[data['plate']],
+                    'information': info,
+                } 
+                vehicle_information.append(object)
         return {"register":vehicle_information,"not_registered":unknown_plates,"turn":turn}
     
     def calculate_reduce_date(self,date_split):

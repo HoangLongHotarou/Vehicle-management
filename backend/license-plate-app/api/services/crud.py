@@ -81,7 +81,7 @@ class VehicleCrud(BaseCrud):
         list = []
         async for data in result:
             list.append(data)
-        print(list)
+        return list
     
     async def filter_detail_vehicle(self,plates,id_region,date):
         pipeline=[

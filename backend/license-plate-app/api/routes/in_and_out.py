@@ -60,7 +60,7 @@ async def check_turn_in_out_realtime(
     check: CheckInAndOutSchema
 ):
     check = check.dict()
-    data = await inAndOutCtrl.check_vehicle_realtime(
+    data = await inAndOutCtrl.check_vehicle_realtime_v2(
         plates_json=check['plates'], 
         id_region=check['id_region'], 
         turn=check['turn'])

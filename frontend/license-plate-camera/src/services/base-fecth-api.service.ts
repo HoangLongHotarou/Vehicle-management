@@ -18,4 +18,12 @@ export class BaseFetchAPI{
             }
         });
     }
+
+    async put(urls: string, obj: object){
+        return axios.put(`${this.resourceUrl+urls}`,obj,{
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+    }
 }

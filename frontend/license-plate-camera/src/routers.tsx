@@ -5,6 +5,7 @@ import App from './App';
 import BaseWebSocketAPI from './services/base-websocket.service';
 import RegionView from './views/region.view';
 import TestView from './views/test.view';
+import Setting from './views/setting.view';
 
 export default function WebRouters(){
     useEffect(()=>{
@@ -18,6 +19,7 @@ export default function WebRouters(){
         <BrowserRouter>
             <Routes>
             <Route path='/' element={<App/>}/>
+            <Route path='setting' element={<Setting/>}/>
             <Route path='region' element={<RegionView/>}/>
             <Route path='test' element={<TestView/>}/>
             </Routes>
