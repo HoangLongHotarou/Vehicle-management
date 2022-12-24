@@ -23,7 +23,7 @@ export default function ShowCamera(props: ShowCameraProps){
         <>
             <div className='test'>
                 <img src={url} width="40%"/>
-                <pre className="section">{JSON.stringify(info, null, ' ')}</pre>
+                <pre className="section section2">{JSON.stringify(info, null, ' ')}</pre>
             </div>
         </>
     );

@@ -36,6 +36,11 @@ async def get_all_entrance_auth_region(
 ):
     return await entranceAuthCtrl.get_all_entrance_auth_region(page, limit)
 
+@router.delete('/regions/{id}')
+async def delete_entrance_auth_region(id: PyObjectId):
+    await entranceAuthCtrl.delete_entrance_auth_region(id)
+    return {"detail":"Delete successfully"}
+
 @router.post('/users',response_model=EntranceAuthUserModelOut)
 async def add_entrance_auth_user(data: EntranceAuthUserModel):
     entrance_auth_user = await entranceAuthCtrl.add_entrance_auth_user(data.dict())
@@ -47,6 +52,11 @@ async def get_all_entrance_auth_user(
     limit: int = Query(10,ge=0,le=10)
 ):
     return await entranceAuthCtrl.get_all_entrance_auth_user(page, limit)
+
+@router.delete('/users/{id}')
+async def delete_entrance_auth_user(id: PyObjectId):
+    await entranceAuthCtrl.delete_entrance_auth_user(id)
+    return {"detail":"Delete successfully"}
 
 # @router.post('/user')
 # async def add_user_entrance_auth():

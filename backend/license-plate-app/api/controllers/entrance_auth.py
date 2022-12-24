@@ -27,12 +27,18 @@ class EntranceAuthController(metaclass=SingletonMeta):
         new = await self.entranceAuthRegionCrud.add(data)
         return new
     
+    async def delete_entrance_auth_region(self,id):
+        await self.entranceAuthRegionCrud.delete(value=id)
+    
     async def get_all_entrance_auth_region(self,page,limit):
         return await self.entranceAuthRegionCrud.get_all_entrance_auth_region(page, limit)
     
     async def add_entrance_auth_user(self,data):
         new = await self.entranceAuthUserCrud.add(data)
         return new
+    
+    async def delete_entrance_auth_user(self,id):
+        await self.entranceAuthUserCrud.delete(value=id)
     
     async def get_all_entrance_auth_user(self,page,limit):
         data = await self.entranceAuthUserCrud.get_all_entrance_auth_user(page, limit)
