@@ -10,6 +10,7 @@ import { RTSPCamera } from '../interfaces/rtsp-camera.interface';
 import ShowCamera from '../components/show-camera/show-camera.component';
 import { LicensePlate } from '../interfaces/license-plate';
 import BaseWebSocketAPI from '../services/base-websocket.service';
+import Board from '../components/board/board.component';
 
 
 export default function RegionView() {
@@ -61,11 +62,12 @@ export default function RegionView() {
           ))}
         </Select>
       </FormControl>
-      <pre className="section">{JSON.stringify(cameras, null, ' ')}</pre>
-      {/* {console.log(cameras)} */}
-      {/* <pre className="section">{JSON.stringify(plate,null,' ')}</pre>*/}
-      {cameras === undefined ? (<>not camera</>) : (cameras.map((camera, i) => (
-        <ShowCamera url={camera['rtsp_url']} data={plate} type={camera['type']} />
+      {/* <pre className="section">{JSON.stringify(cameras, null, ' ')}</pre> */}
+      {!cameras?(<>not camera</>):(cameras.map((camera,i)=>(
+        <div key={i}>
+          <Board name={camera.name} type={camera.type}/>
+          <ShowCamera url={camera['rtsp_url']} data={plate} type={camera['type']} />
+        </div>
       )))}
     </>
   );
