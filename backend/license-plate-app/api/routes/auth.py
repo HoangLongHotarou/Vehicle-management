@@ -1,6 +1,6 @@
 from core.jwt import OAuth2PasswordRequestForm
 from fastapi import APIRouter, Depends
-from api.controllers.controller import *
+from api.controllers.auth import AuthController
 
 
 router = APIRouter(
@@ -9,6 +9,7 @@ router = APIRouter(
 
 @router.post('/oauth2/login')
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
+    authCtrl = AuthController()
     username = form_data.username
     password = form_data.password
     user_lg = {'username':username,'password':password}

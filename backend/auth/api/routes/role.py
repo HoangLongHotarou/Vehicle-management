@@ -4,7 +4,8 @@ from core.jwt import get_current_user
 from fastapi import APIRouter, Depends, Query
 from utils.decorators import check_is_staff, check_is_staff_or_permission
 from utils.pagination import pagination_info
-from api.controllers.controller import *
+from api.controllers.role import RoleController
+
 
 router = APIRouter(
     prefix='/roles',
@@ -19,6 +20,7 @@ async def get_all_roles(
     limit:int=Query(20,ge=0,le=20),
     current_user=Depends(get_current_user)
 ):
+    roleCtrl = RoleController()
     roles,info = await roleCtrl.roleCrud.get_all(is_get_info=True,page=page,limit=limit)
     dict = pagination_info(roles, info)
     return dict
@@ -29,6 +31,7 @@ async def get_role(
     id_role: str,
     current_user=Depends(get_current_user)
 ):
+    roleCtrl = RoleController()
     role = await roleCtrl.roleCrud.get(value=id_role)
     return role
 
@@ -38,6 +41,7 @@ async def add_role(
     role: RoleModel,
     current_user=Depends(get_current_user)
 ):
+    roleCtrl = RoleController()
     await roleCtrl.roleCrud.set_unique([('role',1)])
     new_role = await roleCtrl.roleCrud.add(role.dict())
     return new_role
@@ -61,6 +65,7 @@ async def update_role(
     data: UpdateRoleModel,
     current_user=Depends(get_current_user)
 ):
+    roleCtrl = RoleController()
     await roleCtrl.update_role(id_role, data)
     return {'detail':'Update successfully'}
 
@@ -71,5 +76,6 @@ async def delete_role(
     id_role: str, 
     current_user=Depends(get_current_user)
 ):
+    roleCtrl = RoleController()
     await roleCtrl.delete_role(id_role)
     return {'detail','delete successfully'}

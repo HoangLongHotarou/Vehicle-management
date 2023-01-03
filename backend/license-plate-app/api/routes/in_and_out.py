@@ -13,12 +13,14 @@ from utils.pyobjectid import PyObjectId
 
 from api.schemas.check_in_and_out import CheckInAndOutSchema
 
-from api.controllers.controller import *
+from api.controllers.in_and_out import InAndOutController
+
 
 router = APIRouter(prefix='/in_and_out',tags=['In and out'],responses={'404':{'description': 'Not found'}})
 
 @router.post('/check_image')
 async def check_image(image: UploadFile):
+    inAndOutCtrl = InAndOutController()
     data = base64.b64encode(image.file.read())
     test = await inAndOutCtrl.predict(data)
     return test
@@ -31,6 +33,7 @@ async def turn_in_out(
     select_turn: SelectType = Form(...),
     vehicle_type: VehicleType = Form(...)
 ):
+    inAndOutCtrl = InAndOutController()
     image_base64 = base64.b64encode(image.file.read())
     plates_json = await inAndOutCtrl.predict(image_base64)
     data = await inAndOutCtrl.check_vehicle(
@@ -47,6 +50,7 @@ async def check_turn_in_out(
     task: BackgroundTasks,
     check: CheckInAndOutSchema
 ):
+    inAndOutCtrl = InAndOutController()
     check = check.dict()
     data = await inAndOutCtrl.check_vehicle(
         check['plates'],
@@ -68,6 +72,7 @@ async def get_all_in_and_out_time(
     page: int = Query(0, ge=0),
     limit: int = Query(20, ge=0, le=50),
 ):
+    inAndOutCtrl = InAndOutController()
     sort = None
     if order is not None:
         sort = 1 if order == SortDates.ascending else -1
@@ -77,4 +82,5 @@ async def get_all_in_and_out_time(
 
 @router.get('/statistic_in_and_out')
 async def statistic_in_and_out(date: str):
+    inAndOutCtrl = InAndOutController()
     return await inAndOutCtrl.statistic_in_and_out(date)
