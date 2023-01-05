@@ -59,6 +59,10 @@ class UpdateRegionModel(BaseModel):
     #         }
     #     }
 
+class RegionModelOutForEntrance(BaseModel):
+    region: Optional[str]
+    type: Optional[RegionType]
+
 class RegionModelOut(UpdateRegionModel,IDSchema):
     pass
 
