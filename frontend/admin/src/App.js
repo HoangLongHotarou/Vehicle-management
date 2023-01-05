@@ -9,7 +9,6 @@ import NotFound from './Pages/NotFound/NotFound';
 import Accounts from './Pages/Dashboard/Accounts/Accounts';
 import Home from './Pages/Dashboard/Home/Home';
 import Info from './Pages/Info/Info';
-import Test from './Pages/Dashboard/Test/Test';
 import Regions from './Pages/Dashboard/Regions/Regions';
 import Statistical from './Pages/Dashboard/Statistical/Statistical';
 import ChangePassword from './Pages/ChangePassword/ChangePassword';
