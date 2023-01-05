@@ -35,6 +35,7 @@ export default function RegionView() {
   },[])
 
   const handleChange = (event: any) => {
+    // window.location.reload();
     BaseWebSocketAPI.Instance.sendData({
       status: event.target.value
     })
