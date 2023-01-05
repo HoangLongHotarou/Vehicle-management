@@ -26,7 +26,6 @@ function App() {
         <Route path='accounts' element={<Accounts />} />
         <Route path='regions' element={<Regions />} />
         <Route path='statistical' element={<Statistical />} />
-        <Route path='test' element={<Test />} />
       </Route>
       <Route path='/Info' element={isAuth ? <Info /> : <Navigate to='/Login' />}></Route>
       <Route path='/Change_Pwd' element={isAuth ? <ChangePassword /> : <Navigate to='/Login' />}></Route>
