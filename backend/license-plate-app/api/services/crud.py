@@ -404,3 +404,161 @@ class InAndOutTimeCrud(BaseCrud):
                 info['total_in'] = 0
                 info['total_out'] = 0
         return info
+
+class EntranceAuth(BaseCrud):
+    def __init__(self):
+        super().__init__(f"{app}_entrance_auth")
+
+class EntranceAuthRegion(BaseCrud):
+    def __init__(self):
+        super().__init__(f'{app}_entrance_auth_region')
+
+    async def add(self,data):
+        # index1 = IndexModel([('id_entrance_auth', 1)], unique=True)
+        # index2 = IndexModel([('id_region', 1)], unique=True)
+        # await self.set_multi_key([index1, index2])
+        await self.set_unique([('id_entrance_auth', 1),('id_region', 1)])
+        return await super().add(data)
+
+    async def get_all_entrance_auth_region(self,skip,limit):
+        pipeline = [
+            {
+                '$lookup':
+                {
+                    'from': 'license_plate_region',
+                    'localField':'id_region',
+                    'foreignField':'_id',
+                    'pipeline': [
+                        { '$project': {'region': 1,'type':1 }}
+                    ],
+                    'as':'region'
+                },
+            },{
+                '$unwind':'$region'
+            },
+            {
+                '$lookup':
+                {
+                    'from': 'license_plate_entrance_auth',
+                    'localField':'id_entrance_auth',
+                    'foreignField':'_id',
+                    'as':'entrance_auth'
+                },
+            },{
+                '$unwind':'$entrance_auth'
+            },
+            {
+                '$facet': 
+                {
+                    'metadata': [
+                        {   
+                            '$group': { 
+                                '_id': 'null',
+                                'total': { '$sum': 1 },
+                            },
+                        },
+                        {
+                            '$addFields':{'pages_size':0,'page':skip,'limit':limit}
+                        },
+                    ],
+                    'list':[ 
+                        {
+                            "$skip": (skip-1)*limit if skip > 0 else 0
+                        },
+                        {
+                            '$limit': limit
+                        }
+                    ]
+                },
+            },
+            {
+                '$project': { 
+                    'list': 1,
+                    'total': { '$arrayElemAt': [ '$metadata.total', 0 ] },
+                    'pages_size': { '$arrayElemAt': [ '$metadata.pages_size', 0 ] },
+                    'page': { '$arrayElemAt': [ '$metadata.page', 0 ] },
+                    'limit': { '$arrayElemAt': [ '$metadata.limit', 0 ] },
+                }
+            }
+        ]
+        result = self.db.mongodb[self.model].aggregate(
+            pipeline
+        )
+        list = []
+        async for data in result:
+            if data['list']==[]:
+                list=data
+            else:
+                data['pages_size'] = math.ceil(data['total']/limit) if limit > 0 else 0
+                list=data
+        return list 
+
+class EntranceAuthUser(BaseCrud):
+    def __init__(self):
+        super().__init__(f'{app}_entrance_auth_user')
+    
+    async def add(self,data):
+        # index1 = IndexModel([('id_entrance_auth', 1)], unique=True)
+        # index2 = IndexModel([('id_user', 1)], unique=True)
+        # await self.set_multi_key([index1, index2])
+        await self.set_unique([('id_entrance_auth', 1),('id_user', 1)])
+        return await super().add(data)    
+    
+    async def get_all_entrance_auth_user(self,skip,limit):
+        pipeline = [
+            {
+                '$lookup':
+                {
+                    'from': 'license_plate_entrance_auth',
+                    'localField':'id_entrance_auth',
+                    'foreignField':'_id',
+                    'as':'entrance_auth'
+                },
+            },{
+                '$unwind':'$entrance_auth'
+            },
+            {
+                '$facet': 
+                {
+                    'metadata': [
+                        {   
+                            '$group': { 
+                                '_id': 'null',
+                                'total': { '$sum': 1 },
+                            },
+                        },
+                        {
+                            '$addFields':{'pages_size':0,'page':skip,'limit':limit}
+                        },
+                    ],
+                    'list': [ 
+                        {
+                            "$skip": (skip-1)*limit if skip > 0 else 0
+                        },
+                        {
+                            '$limit': limit
+                        }
+                    ]
+                }
+            },
+            {
+                '$project': { 
+                    'list': 1,
+                    'total': { '$arrayElemAt': [ '$metadata.total', 0 ] },
+                    'pages_size': { '$arrayElemAt': [ '$metadata.pages_size', 0 ] },
+                    'page': { '$arrayElemAt': [ '$metadata.page', 0 ] },
+                    'limit': { '$arrayElemAt': [ '$metadata.limit', 0 ] },
+                }
+            }
+        ]
+        result = self.db.mongodb[self.model].aggregate(
+            pipeline
+        )
+        list = []
+        async for data in result:
+            if data['list']==[]:
+                list=data
+            else:
+                data['pages_size'] = math.ceil(data['total']/limit) if limit > 0 else 0
+                list=data
+        return list 
