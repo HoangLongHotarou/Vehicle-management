@@ -18,6 +18,10 @@ class EntranceAuthUserModel(BaseModel):
     id_entrance_auth: PyObjectId = Field(...)
     enable: bool = True
 
+class EntranceAuthStudentModel(BaseModel):
+    id_user: PyObjectId = Field(...)
+    enable: bool = True
+
 class EntranceAuthUserModelOut(EntranceAuthUserModel, IDSchema):
     pass
 
