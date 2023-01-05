@@ -35,12 +35,6 @@ services:
     depends_on:
       - auth_service
       - ai_service
-  # frontend_admin:
-  #   build:
-  #     context: .
-  #     dockerfile: dockerfiles/frontend-admin.dockerfile
-  #   volumes:
-  #     - react_build_admin:/react/build
   nginx:
     build:
       context: .
@@ -48,7 +42,7 @@ services:
     image: hotaroudazai/nginx-license-plate
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
-      # - react_build_admin:/var/www/react_admin
+      - ./frontend/admin/build:/var/www/react_admin
     ports:
       - '80:80'
       - '443:80'
@@ -56,6 +50,3 @@ services:
       - auth_service
       - app_service
       - ai_service
-      # - frontend_admin
-# volumes:
-#   react_build_admin:
