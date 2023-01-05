@@ -15,7 +15,6 @@ export default function Setting() {
 
     useEffect(() => {
         fetchRegion.get_all().then((res) => {
-            console.log(res);
             setRegions(res);
         })
     }, [info])
@@ -49,10 +48,10 @@ export default function Setting() {
         if(region){
             let announce = await fetchRegion.update(region._id,{cameras:camera_list})
             // console.log(info)
-            if(announce){
-                alert((info as any).detail)
-            }
             setInfo(announce)
+            if(announce){
+                alert((announce as any).detail)
+            }
         }
     } 
 

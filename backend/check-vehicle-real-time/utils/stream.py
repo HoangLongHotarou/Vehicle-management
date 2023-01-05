@@ -135,6 +135,7 @@ class CameraStream(BaseCamera):
     def frames(self)->any:
         frame = cv2.VideoCapture(self.src)
         count = 0
+        count1 = 0
         plates = []
         try:
             while True:
@@ -143,6 +144,7 @@ class CameraStream(BaseCamera):
                     print('cannot connect camera')
                     break
                 count += 1
+                count1 += 1
                 if count%60==0: 
                     count=0
                     thread = threading.Thread(target=self.useAI,args=(img,))
@@ -153,8 +155,14 @@ class CameraStream(BaseCamera):
                     # with concurrent.futures.ThreadPoolExecutor() as executor:
                     #     future = executor.submit(self.fetchDetect,img)
                     #     plates = future.result()
+                
                 register = self.data_obj.get('register',[])
-                unregister = self.data_obj.get('not_registered',[])
+                unregister = self.data_obj.get('not_registered',[])    
+                
+                if count1&250==0 and (register!=[] or unregister != []):
+                    self.data_obj = {}
+                    count1 = 0
+                
                 for re in register:
                     x0 = re['coordinate']['x0']
                     y0 = re['coordinate']['y0']

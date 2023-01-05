@@ -10,6 +10,7 @@ from utils.singleton import SingletonMeta
 class FetchYoloAPI(metaclass=SingletonMeta):
     def __init__(self):
         self.url = 'http://ai_service:8000/api/v1/yolo-license-plate'
+        # self.url = 'http://127.0.0.1:8002/api/v1/yolo-license-plate'
     
     async def predict(self,image):
         data = aiohttp.FormData()
@@ -23,6 +24,7 @@ class FetchYoloAPI(metaclass=SingletonMeta):
 class FetchVehicleManager(metaclass=SingletonMeta):
     def __init__(self) -> None:
         self.url = 'http://app_service:8000/api/v1/license-plate-app'
+        # self.url = 'http://127.0.0.1:8003/api/v1/license-plate-app'
     
     async def check_turn_in_out(self,data):
         async with aiohttp.ClientSession() as session:

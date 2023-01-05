@@ -36,5 +36,6 @@ class YOLOv7Detect(YOLOv7):
 
 class YOLOv7Recognize(YOLOv7):
     def __init__(self, cuda=False) -> None:
+        # w = 'onnx_folder/RecognizeV7/best.onnx'
         w = 'onnx_folder/RecognizeV7/recognize_best.onnx'
         super().__init__(w,cuda)

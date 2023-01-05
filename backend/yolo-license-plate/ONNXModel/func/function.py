@@ -3,7 +3,7 @@ import re
 
 def detection(yolo: BaseYOLO, image):
     for (x0,y0,x1,y1,score,label) in yolo.predict(image):
-        if score < 0.7: continue
+        if score <= 0.5: continue
         # yield image[y0:y1,x0:x1]
         yield (x0,y0,x1,y1)
 
@@ -21,7 +21,7 @@ def recognize(yolo: BaseYOLO, image):
     above = {}
     under = {}
     for coordinates in coordinates_matrix:
-        if float(coordinates[4]<0.5): return None
+        if float(coordinates[4]<=0.5): return None
         if abs(coordinates[1]-track) < 12:
             above[coordinates[0]] = (float(coordinates[4]),int(coordinates[5]))
         else:
