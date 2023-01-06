@@ -54,6 +54,7 @@ async def add_entrance_auth_user(data: EntranceAuthUserModel):
 
 @router.post('/users/student',response_model=EntranceAuthUserModelOut)
 async def add_entrance_auth_user(data: EntranceAuthStudentModel):
+    entranceAuthCtrl = EntranceAuthController()
     data = {**data.dict(),"id_entrance_auth":PyObjectId("63948266198c29f9c21005fa")}
     entrance_auth_user = await entranceAuthCtrl.add_entrance_auth_user(data)
     return entrance_auth_user
