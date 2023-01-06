@@ -14,6 +14,7 @@ from pymongo import IndexModel
 from utils.pyobjectid import PyObjectId
 from utils.singleton import SingletonMeta
 from db.database import get_database
+from api.services.fetchapi import FetchVehicleManagement
 
 import asyncio
 
@@ -75,7 +76,8 @@ class UserController(metaclass=SingletonMeta):
         otp_user = OTPs[len(OTPs)-1]
         if otp_user['otp']==confirmOTP.otp:
             user = UserModel(**otp_user)
-            await self.userCrud.add(user.dict())
+            new_user = await self.userCrud.add(user.dict())
+            await self.vehicleManagementCrud.set_student_role({"id_user":str(new_user['_id'])})
         else:
             raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE,detail='OTP không hợp lệ')
 
