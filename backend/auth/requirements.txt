@@ -65,3 +65,4 @@ wcwidth==0.2.5
 websockets==10.3
 wrapt==1.14.1
 cloudinary==1.30.0
+aiohttp==3.8.3
