@@ -26,6 +26,7 @@ class UserController(metaclass=SingletonMeta):
         self.roleCrud = RoleCrud()
         self.userCrud = UserCrud()
         self.otpCrud = OTPCrud()
+        self.vehicleManagementCrud = FetchVehicleManagement()
 
     async def update_avatar(self,id,file):
         user = await self.userCrud.get(value=id,projection={'avatar':1})
