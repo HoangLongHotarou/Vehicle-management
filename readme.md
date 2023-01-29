@@ -3,15 +3,15 @@
 A Vehicle Management System that analyze and record the vehicles using ANPR (Automatic number plate recognition)
 ### Microservice:
 ![img](demo/Microservice.png)
-in backend folder:
+In backend folder:
 - Auth API: auth folder
 - Vehicle Management API: license-plate-app folder
 - YOLO detect & recognize Plate API: yolo-license-plate folder
 - Realtime License Plate Recognition API: check-vehicle-real-time folder
 ### Demo:
-Swagger:
+- Swagger:
 [![Watch the video](https://i.imgur.com/vKb2F1B.png)](https://www.youtube.com/watch?v=Rwx2PFWrNaw)
-Realtime License Plate Recognition:
+- Realtime License Plate Recognition:
 [![Watch the video](https://i.imgur.com/vKb2F1B.png)](https://www.youtube.com/watch?v=C4vqtv3u_jI)
 ### Technology:
  - Microservice:NGINX, FastAPI, Mongodb, YOLO, Docker.
