@@ -9,9 +9,9 @@ In backend folder:
 - YOLO detect & recognize Plate API: yolo-license-plate folder
 - Realtime License Plate Recognition API: check-vehicle-real-time folder
 ### Demo:
-- Swagger:
+ 1. Swagger:
 [![Watch the video](https://i.imgur.com/vKb2F1B.png)](https://www.youtube.com/watch?v=Rwx2PFWrNaw)
-- Realtime License Plate Recognition:
+ 2. Realtime License Plate Recognition:
 [![Watch the video](https://i.imgur.com/vKb2F1B.png)](https://www.youtube.com/watch?v=C4vqtv3u_jI)
 ### Technology:
  - Microservice:NGINX, FastAPI, Mongodb, YOLO, Docker.
