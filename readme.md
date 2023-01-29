@@ -10,11 +10,11 @@ In backend folder:
 - Realtime License Plate Recognition API: check-vehicle-real-time folder
 ### Demo:
  1. Swagger:
+ [Demo Video Link](https://www.youtube.com/watch?v=Rwx2PFWrNaw)
 ![img](demo/swagger.png)
-[Link Video Demo](https://www.youtube.com/watch?v=Rwx2PFWrNaw)
  2. Realtime License Plate Recognition:
+ [Demo Video Link](https://www.youtube.com/watch?v=C4vqtv3u_jI)
 ![img](demo/realtime.png)
-[Link Video Demo](https://www.youtube.com/watch?v=C4vqtv3u_jI)
 ### Technology:
  - Microservice:NGINX, FastAPI, Mongodb, YOLO, Docker.
  - Front-end: React.js (Using TypeScript)
