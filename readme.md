@@ -11,9 +11,6 @@ In backend folder:
 ### Demo:
  1. Swagger:
  [Demo Video Link](https://www.youtube.com/watch?v=Rwx2PFWrNaw)
- - Auth: http://13.112.242.104/api/v1/auth/docs
- - Vehicle Management: http://13.112.242.104/api/v1/license-plate-app/docs
- - YOLO plate recognition: http://13.112.242.104/api/v1/yolo-license-plate/docs  
 
 ![img](demo/swagger.png)
  2. Realtime License Plate Recognition:
