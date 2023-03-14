@@ -1,0 +1,79 @@
+@import '../../Styles/variables.scss';
+
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+.error-container {
+    width: 100%;
+    height: 100vh;
+    background: $secondary-color;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+
+    .error-code {
+        font-size: 240px;
+        display: flex;
+        gap: 10px;
+        color: $primary-color;
+        font-weight: 700;
+        line-height: 240px;
+        user-select: none;
+
+        span {  
+            position: relative;          
+            &:first-child {
+                animation: TopToBottom linear infinite 4s;
+            }                 
+            &:last-child {
+                animation: BottomToTop linear infinite 4s;
+            }  
+        }
+    }
+
+    p {
+        text-transform: capitalize;
+        font-weight: 400;
+    }
+}
+
+@keyframes TopToBottom {
+    0%, 100% {
+        top: -20px;
+    }
+    50% {
+        top: 20px;
+    }
+}
+
+@keyframes BottomToTop {
+    0%, 100% {
+        bottom: -20px;
+    }
+    50% {
+        bottom: 20px;
+    }
+}
+
+@media screen and (max-width: 648px) {
+    .error-container {
+        .error-code {
+            font-size: 180px;
+            line-height: 200px;
+        }
+    }
+}
+
+
+@media screen and (max-width: 420px) {
+    .error-container {
+        .error-code {
+            font-size: 100px;
+            line-height: 140px;
+        }
+    }
+}

@@ -1,0 +1,50 @@
+@import '../../Styles/variables.scss';
+
+.MuiDrawer-paper {
+    background-color: $secondary-color !important;
+}
+
+.menu-item {
+    display: flex !important;
+    align-items: center !important;
+
+    .icon-option {
+        margin-top: 3px;
+        margin-right: 5px;
+    }
+}
+
+.item-list {
+    position: relative;   
+    
+    &::before {
+        content: '';
+        position: absolute;
+        top: 50%;        
+        right: 0;
+        transform: translateY(-50%);
+        background-color: $primary-color;
+        height: 0;
+        width: 6px;
+        transition: linear 0.2s;
+    }
+
+    &:hover::before{
+        height: 100%;
+    }
+
+    &.active {
+        background-color: $primary-color;
+        color: $white-color;   
+        
+        .icon-item {
+            color: $white-color;
+        }
+    }    
+}
+
+@media screen and (max-width: 420px) {
+    .welcome {
+        display: none;
+    }
+}

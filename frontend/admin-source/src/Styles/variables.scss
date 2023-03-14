@@ -1,0 +1,17 @@
+$primary-color: #333;
+$secondary-color: #f1f1f1;
+$white-color: #fff;
+$border-color: #aaaaaa;
+
+$background-color: #333;
+$background-blur-light: rgba(255,255,255,0.2);
+$background-blur-dark: rgba(0,0,0,0.6);
+
+:export {
+    background: $background-color;
+    bgBlurLight: $background-blur-light;
+    bgBlurDark: $background-blur-dark;
+    whiteColor: $white-color;
+    primary: $primary-color;
+    secondary: $secondary-color;
+}
