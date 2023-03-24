@@ -22,7 +22,7 @@ import asyncio
 db = asyncio.run(get_database())
 
 class UserController(metaclass=SingletonMeta):
-    def __init__(self, ):
+    def __init__(self):
         self.db = db
         self.roleCrud = RoleCrud()
         self.userCrud = UserCrud()

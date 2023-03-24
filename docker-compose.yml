@@ -21,6 +21,17 @@ services:
       - ./backend/yolo-license-plate:/yolo-license-plate
     ports:
       - '8002:8000'
+  face_recognition_service:
+    build: 
+      context: .
+      dockerfile: dockerfiles/face-recognition.dockerfile
+    image: hotaroudazai/face-recognition
+    volumes:
+      - ./backend/face-recognition:/face-recognition
+    env_file:
+      - ./env/face-recognition.env
+    ports:
+      - '8005:8000'
   app_service:
     build:
       context: .
@@ -44,10 +55,10 @@ services:
       - ./backend/check-vehicle-real-time:/check-vehicle-real-time
     ports:
       - '8004:8000'
-  # redis:
-  #   image: redis:alpine3.16
-  #   ports:
-  #     - '6379:6379'
+  redis:
+    image: redis:alpine3.16
+    ports:
+      - '6379:6379'
   frontend:
     build:
       context: .
@@ -71,14 +82,14 @@ services:
       - ai_service
       - frontend
       # - check_vehicle_service
-  # worker:
-  #   image: hotaroudazai/license-plate-app
-  #   command: celery -A api.tasks.worker worker --loglevel=INFO
-  #   env_file:
-  #     - ./env/license-plate-app.env
-  #   volumes:
-  #     - ./backend/license-plate-app:/license-plate-app
-  #   depends_on:
-  #     - app_service
+  worker:
+    image: hotaroudazai/face-recognition
+    command: celery -A api.tasks.worker worker --loglevel=INFO -P eventlet
+    env_file:
+      - ./env/face-recognition.env
+    volumes:
+      - ./backend/face-recognition:/face-recognition
+    depends_on:
+      - nginx
 volumes:
   react_build:

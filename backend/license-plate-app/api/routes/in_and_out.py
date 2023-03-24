@@ -15,6 +15,7 @@ from api.schemas.check_in_and_out import CheckInAndOutSchema
 
 from api.controllers.controller import *
 
+
 router = APIRouter(prefix='/in_and_out',tags=['In and out'],responses={'404':{'description': 'Not found'}})
 
 @router.post('/check_image')

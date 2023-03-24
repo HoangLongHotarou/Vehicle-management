@@ -159,7 +159,7 @@ class CameraStream(BaseCamera):
                 register = self.data_obj.get('register',[])
                 unregister = self.data_obj.get('not_registered',[])    
                 
-                if count1&250==0 and (register!=[] or unregister != []):
+                if count1%250==0 and (register!=[] or unregister != []):
                     self.data_obj = {}
                     count1 = 0
                 

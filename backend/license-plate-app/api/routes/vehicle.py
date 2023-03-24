@@ -28,7 +28,6 @@ async def get_all_vehicle(
     vehicles, info = await vehicleCtrl.vehicleCrud.get_all(is_get_info=True, page=page, limit=limit)
     return pagination_info(vehicles, info)
 
-
 @router.post('/me', response_model=VehicleModelOut)
 async def add_vehicle_for_current_user(
     
