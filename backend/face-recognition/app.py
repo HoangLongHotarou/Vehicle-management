@@ -14,9 +14,9 @@ cloudinary.config(
 
 
 app = FastAPI(
-    openapi_url='/api/v1/face-recognition/openapi.json',
-    docs_url='/api/v1/face-recognition/docs',
-    redoc_url='/api/v1/face-recognition/redoc',
+    openapi_url='/api/v1/vehicle-face-recognition/openapi.json',
+    docs_url='/api/v1/vehicle-face-recognition/docs',
+    redoc_url='/api/v1/vehicle-face-recognition/redoc',
     title='Face Recognition',
     version='1.0.0'
 )

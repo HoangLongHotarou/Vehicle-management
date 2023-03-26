@@ -1,3 +1,3 @@
-from .avi_face import AviFaceController
+from .face_recognition import FaceRecognitionController
 
-aviFaceController = AviFaceController()
+faceRecognitionController = FaceRecognitionController()

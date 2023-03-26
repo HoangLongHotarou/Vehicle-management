@@ -1,6 +1,7 @@
-from pydantic import BaseMode
+from pydantic import BaseModel
 from typing import Optional,List
 
-class EmbeddingFace(BaseMode):
+class EmbeddingFace(BaseModel):
     username: Optional[str]
-    embeddings: List[any] = []
+    url: Optional[str]
+    embs: List[list]

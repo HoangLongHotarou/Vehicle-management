@@ -12,8 +12,6 @@ COPY ./backend/face-recognition/requirements.txt .
 
 RUN pip install --no-cache-dir -r /face-recognition/requirements.txt
 
-RUN pip install eventlet
-
 COPY ./backend/face-recognition .
 
 CMD [ "python", "main.py" ]

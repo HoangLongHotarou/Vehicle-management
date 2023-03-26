@@ -1,8 +1,5 @@
 from facenet_pytorch import MTCNN, InceptionResnetV1, fixed_image_standardization, training
 import torch
-from torch.utils.data import DataLoader, SubsetRandomSampler
-from torch import optim
-from torch.optim.lr_scheduler import MultiStepLR
 from torchvision import datasets, transforms
 import numpy as np
 import os
@@ -74,22 +71,22 @@ class FaceRecognition():
         return embs
 
     def reload_hnswlib(self, embs, names):
-        lg = len(embs)
-        self.p = hnswlib.Index(space='l2', dim=512)
-        self.p.init_index(max_elements=lg, ef_construction=200, M=16)
-        self.p.add_items(embs, np.arange(0, lg))
-        self.p.save_index('data_file/embedding.bin')
+        lg = len(names)
+        p = hnswlib.Index(space='l2', dim=512)
+        p.init_index(max_elements=lg, ef_construction=200, M=16)
+        p.add_items(embs, np.arange(0, lg))
+        p.save_index('data_file/embedding.bin')
         torch.save([names], 'data_file/names.pt')
-        self.p = None
+        # self.p = None
 
     def predict(self, image):
-        if self.p == None:
-            self.p = hnswlib.Index(space='l2', dim=512)
-            saved_data = torch.load('data_file/names.pt')
-            self.names = saved_data[0]
-            self.p.load_index('data_file/embedding.bin',
-                              max_elements=len(self.names))
+        # if self.p == None:
+        self.p = hnswlib.Index(space='l2', dim=512)
+        saved_data = torch.load('data_file/names.pt')
+        self.names = saved_data[0]
+        self.p.load_index('data_file/embedding.bin', max_elements=len(self.names))
         # img = cv2.imread(image)
+        
         img = image
         img = img[:,:,::-1]
         boxes, _ = self.mtcnn.detect(img)
@@ -108,4 +105,5 @@ class FaceRecognition():
                     print(distance)
                     recognized = self.names[labels[0][0]]
                     results.append({'username': recognized,'distance': float(distance), 'coordinate': bbox})
+                results.append(float(distance))
         return results

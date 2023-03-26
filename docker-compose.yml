@@ -84,7 +84,7 @@ services:
       # - check_vehicle_service
   worker:
     image: hotaroudazai/face-recognition
-    command: celery -A api.tasks.worker worker --loglevel=INFO -P eventlet
+    command: celery -A api.tasks.worker worker --loglevel=INFO
     env_file:
       - ./env/face-recognition.env
     volumes:
