@@ -14,17 +14,19 @@ cloudinary.config(
     api_secret=settings.API_SECRET
 )
 
+async def processing(video_bytes,username):
+    await connect_to_mongo()
+    await faceRecognitionController.train(
+        bytes.fromhex(video_bytes), 
+        username
+    )
+    await close_mongo_connection()
+
 @celery.task()
 def task_train(video_bytes,username):
     async_to_sync(
-        connect_to_mongo
-    )()
-    async_to_sync(
-        faceRecognitionController.train,
-    )(bytes.fromhex(video_bytes), username)
-    async_to_sync(
-        close_mongo_connection
-    )()
+        processing,
+    )(video_bytes, username)
     return "OK"
 
 @celery.task()
