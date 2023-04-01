@@ -14,6 +14,8 @@ class ServerSettings(BaseSettings):
     HOST: str = '0.0.0.0'
     PORT: int = 8000
 
+class ConstValue(BaseSettings):
+    MAX_ELEMENTS = 100000
 
 class DatabaseSettings(BaseSettings):
     DB_URL: str = os.environ.get(
@@ -38,7 +40,8 @@ class Settings(
     ServerSettings,
     DatabaseSettings,
     CloudinarySettings,
-    RedisSettings
+    RedisSettings,
+    ConstValue
 ):
     pass
 

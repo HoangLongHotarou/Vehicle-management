@@ -18,27 +18,23 @@ router = APIRouter(
 
 @router.post('/train')
 async def train(username: str, file: UploadFile):
-    info = await faceRecognitionController.get_face(username)
-    if info == None:
-        video_bytes = await file.read()
-        task_train.delay(video_bytes.hex(), username)
-        return JSONResponse(
-            status_code=status.HTTP_202_ACCEPTED,
-            content={
-                'detail':f'{username} đang được xử lý'
-            }
-        )
+    # info = await faceRecognitionController.get_face(username)
+    # if info == None:
+    video_bytes = await file.read()
+    task_train.delay(video_bytes.hex(), username)
     return JSONResponse(
-        status_code=status.HTTP_302_FOUND,
+        status_code=status.HTTP_202_ACCEPTED,
         content={
-            'detail':f'{username} đã tồn tại trong dữ liệu nhận dạng khuôn mặt'
+            'detail': f'{username} đang được xử lý'
         }
     )
+    # return JSONResponse(
+    #     status_code=status.HTTP_302_FOUND,
+    #     content={
+    #         'detail': f'{username} đã tồn tại trong dữ liệu nhận dạng khuôn mặt'
+    #     }
+    # )
 
-# @router.post('/test')
-# async def train():
-#     add.delay(1,2)
-#     return {"test": "OK"}
 
 @router.post('/recognition')
 async def recognition(file: bytes = File()):
@@ -48,7 +44,7 @@ async def recognition(file: bytes = File()):
     return {'list': result}
 
 
-@router.post('/test')
-async def test():
-    await faceRecognitionController.reload_model()
-    return "test"
+@router.delete('/remove_face/{username}')
+async def remove_face(username: str):
+    await faceRecognitionController.remove_face(username)
+    return {"test": "finish"}

@@ -1,49 +1,78 @@
 from utils.singleton import SingletonMeta
-from api.services.crud import EmbeddingFaceCrud
+from api.services.crud import InfoCrud
 from api.ai_model.face_recognition import FaceRecognition
 from core.config import settings
-from api.models.embedding_face import EmbeddingFace
+from api.models.face_recognition_info import FaceRecognitionInfo
+from utils.string2digit import hash_string2digit
+from utils.pyobjectid import PyObjectId
+
 import cloudinary.uploader as cloud_uploader
 import time
 
-# from db.database import 
+# from db.database import
+
+
 class FaceRecognitionController(metaclass=SingletonMeta):
     def __init__(self):
-        self.embeddingFaceCrud = EmbeddingFaceCrud()
+        self.infoCrud = InfoCrud()
         self.faceRecognition = FaceRecognition()
-    
-    async def get_face(self, username):
-        return await self.embeddingFaceCrud.get(query={'username':username},projection={'url':1,'embs':1})
-    
-    async def train(self,video_bytes,username):
-        start = time.time()
-        result = cloud_uploader.upload(
-            video_bytes,
-            resource_type="video",
-            folder=settings.STORE
-        )
-        url = result.get('url')
+
+    # async def get_face(self, username):
+    #     return await self.infoCrud.get(query={'username': username}, projection={'url': 1, 'embs': 1})
+
+    async def train(self, video_bytes, username):
+        info = await self.infoCrud.get(query={'username': username})
+        url = None
+        id_info = None
+        hash_username = hash_string2digit(username)
+        if info:
+            url = info.get('url')
+            id_info = info.get('_id')
+        else:
+            result = cloud_uploader.upload(
+                video_bytes,
+                resource_type="video",
+                folder=settings.STORE
+            )
+            url = result.get('url')
+            video_face_obj = FaceRecognitionInfo(
+                username=username,
+                hash_username=hash_username,
+                url=url,
+            )
+            new_data = await self.infoCrud.add(data=video_face_obj.dict())
+            id_info = new_data.get('_id')
         embs = self.faceRecognition.train(url)
-        embedding_face_obs = EmbeddingFace(
-            username=username,
-            url=url,
-            embs=embs
+        self.faceRecognition.continue_train(embs, hash_username)
+        await self.infoCrud.update(
+            value=id_info,
+            config_data={'len_embs': len(embs)}
         )
-        await self.embeddingFaceCrud.add(data=embedding_face_obs.dict())
-        await self.reload_model()
-        end = time.time()
-        print(f'finish task {end-start}')
 
-    async def reload_model(self):
-        infos,_ = await self.embeddingFaceCrud.get_all()
-        names = []
-        embs =[]
-        for info in infos:
-            for emb in info['embs']:
-                embs.append(emb)
-                names.append(info['username'])
-        self.faceRecognition.reload_hnswlib(embs, names)
+    async def remove_face(self, username):
+        info = await self.infoCrud.get(
+            query={'username': username},
+        )
+        if info == None:
+            return
+        url = info.get('url')
+        public_id = url.rsplit('/', 1)[1].split('.')[0]
+        hash_username = hash_string2digit(username)
+        len_embs = info.get('len_embs')
+        self.faceRecognition.delete_face(hash_username, len_embs)
+        cloud_uploader.destroy(f'{settings.STORE}/{public_id}')
+        await self.infoCrud.delete(value=info.get('_id'))
 
-    async def recognition(self,image):
+    # async def reload_model(self):
+    #     infos,_ = await self.videoFaceCrud.get_all()
+    #     names = []
+    #     embs =[]
+    #     for info in infos:
+    #         for emb in info['embs']:
+    #             embs.append(emb)
+    #             names.append(info['username'])
+    #     self.faceRecognition.reload_hnswlib(embs, names)
+
+    async def recognition(self, image):
         result = self.faceRecognition.predict(image)
         return result
