@@ -21,6 +21,7 @@ import asyncio
 
 db = asyncio.run(get_database())
 
+
 class UserController(metaclass=SingletonMeta):
     def __init__(self):
         self.db = db
@@ -29,18 +30,17 @@ class UserController(metaclass=SingletonMeta):
         self.otpCrud = OTPCrud()
         self.vehicleManagementCrud = FetchVehicleManagement()
 
-    async def update_avatar(self,id,file):
-        user = await self.userCrud.get(value=id,projection={'avatar':1})
+    async def update_avatar(self, id, file):
+        user = await self.userCrud.get(value=id, projection={'avatar': 1})
         url = user.get('avatar')
         if url != None:
-            public_id = url.rsplit('/',1)[1].split('.')[0]
+            public_id = url.rsplit('/', 1)[1].split('.')[0]
             cloudinary.uploader.destroy(f'{settings.STORE}/{public_id}')
-        result = cloudinary.uploader.upload(file,folder=settings.STORE)
+        result = cloudinary.uploader.upload(file, folder=settings.STORE)
         url = result.get('url')
         update_avatar = UpdateAvatar(avatar=url)
         await self.userCrud.update(value=id, config_data=update_avatar.dict())
         return url
-
 
     async def register(self, user: UserModel, task):
         await self.userCrud.set_multi_unique()
@@ -60,10 +60,11 @@ class UserController(metaclass=SingletonMeta):
                                 detail=f'{announce}đã tồn tại')
         user.password = get_password_hash(user.password)
         otp = create_otp_confirm()
-        sendOTP = SendOTP(**{**user.dict(),**{'otp':otp,'created_at':datetime.utcnow()}})
+        sendOTP = SendOTP(
+            **{**user.dict(), **{'otp': otp, 'created_at': datetime.utcnow()}})
         await self.otpCrud.add(sendOTP.dict())
         task.add_task(
-            send_otp, "Xác nhận đăng kí tài khoản",user.email,{
+            send_otp, "Xác nhận đăng kí tài khoản", user.email, {
                 'title': "Xác nhận đăng kí tài khoản",
                 'name': user.email,
                 'OTP': otp
@@ -72,51 +73,56 @@ class UserController(metaclass=SingletonMeta):
 
     async def confirm_register(self, confirmOTP):
         OTPs = []
-        OTPs,_ = await self.otpCrud.get_all(query={'email':confirmOTP.email})
+        OTPs, _ = await self.otpCrud.get_all(query={'email': confirmOTP.email})
         if OTPs == []:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail='Địa chỉ email không hợp lệ')
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail='Địa chỉ email không hợp lệ')
         otp_user = OTPs[len(OTPs)-1]
-        if otp_user['otp']==confirmOTP.otp:
+        if otp_user['otp'] == confirmOTP.otp:
             user = UserModel(**otp_user)
             new_user = await self.userCrud.add(user.dict())
-            await self.vehicleManagementCrud.set_student_role({"id_user":str(new_user['_id'])})
+            await self.vehicleManagementCrud.set_student_role({"id_user": str(new_user['_id'])})
         else:
-            raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE,detail='OTP không hợp lệ')
+            raise HTTPException(
+                status_code=status.HTTP_406_NOT_ACCEPTABLE, detail='OTP không hợp lệ')
 
-    async def forget_password(self,user,task):
+    async def forget_password(self, user, task):
         check_email = await self.userCrud.get(query={'email': user.email})
         if check_email is None:
             raise HTTPException(status.HTTP_400_BAD_REQUEST,
                                 detail=f'{user.email} chưa được đăng ký')
         otp = create_otp_confirm()
-        sendOTP = SendOTP(**{**user.dict(),**{'otp':otp,'created_at':datetime.utcnow()}})
+        sendOTP = SendOTP(
+            **{**user.dict(), **{'otp': otp, 'created_at': datetime.utcnow()}})
         await self.otpCrud.add(sendOTP.dict())
         task.add_task(
-            send_otp, "Xác nhận reset mật khẩu",user.email,{
+            send_otp, "Xác nhận reset mật khẩu", user.email, {
                 'title': "Xác nhận reset mật khẩu",
                 'name': user.email,
                 'OTP': otp
             }
         )
-    
-    async def confirm_forget_password(self,confirmOTP):
+
+    async def confirm_forget_password(self, confirmOTP):
         OTPs = []
-        OTPs,_ = await self.otpCrud.get_all(query={'email':confirmOTP.email})
+        OTPs, _ = await self.otpCrud.get_all(query={'email': confirmOTP.email})
         if OTPs == []:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail='Địa chỉ email không hợp lệ')
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail='Địa chỉ email không hợp lệ')
         otp_user = OTPs[len(OTPs)-1]
-        if otp_user['otp']==confirmOTP.otp:
-            user = await self.userCrud.get(query={'email':confirmOTP.email})
+        if otp_user['otp'] == confirmOTP.otp:
+            user = await self.userCrud.get(query={'email': confirmOTP.email})
             token = create_access_token(user)
             return token
         else:
-            raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE,detail='OTP không hợp lệ')
+            raise HTTPException(
+                status_code=status.HTTP_406_NOT_ACCEPTABLE, detail='OTP không hợp lệ')
 
-    async def reset_password(self,resetPassword):
+    async def reset_password(self, resetPassword):
         token_user = get_current_user(resetPassword.token)
         await self.userCrud.update(
-            value=token_user.id, 
-            config_data={'password':get_password_hash(resetPassword.password)}
+            value=token_user.id,
+            config_data={'password': get_password_hash(resetPassword.password)}
         )
 
     async def login(self, user_lg: UserModel):
@@ -134,25 +140,25 @@ class UserController(metaclass=SingletonMeta):
             'token_type': "bearer"
         }
 
-    async def delete_user(self,id_user):
+    async def delete_user(self, id_user):
         async with await self.db.mongodb_client.start_session() as session:
             async with session.start_transaction():
-                await self.userCrud.delete(value=id_user,session=session)
-                roles,_ = await self.roleCrud.get_all(query={'users':PyObjectId(id_user)},projection={'_id':1})
+                await self.userCrud.delete(value=id_user, session=session)
+                roles, _ = await self.roleCrud.get_all(query={'users': PyObjectId(id_user)}, projection={'_id': 1})
                 if roles != []:
                     ids_roles = [role['_id'] for role in roles]
                     await self.roleCrud.pull_user(ids_roles, id_user, session)
 
-    async def get_permission(self,id_user):
-        user = await self.userCrud.get(value=id_user,projection={'roles':1,'is_staff':1})
-        roles,_ = await self.roleCrud.get_all(query={'_id':{'$in':user['roles']}},projection={'_id':0,'role':1,'permissions':1})
-        return {'is_staff':user.get('is_staff',False),'roles':roles}
+    async def get_permission(self, id_user):
+        user = await self.userCrud.get(value=id_user, projection={'roles': 1, 'is_staff': 1})
+        roles, _ = await self.roleCrud.get_all(query={'_id': {'$in': user['roles']}}, projection={'_id': 0, 'role': 1, 'permissions': 1})
+        return {'is_staff': user.get('is_staff', False), 'roles': roles}
 
-    async def update_roles(self,id_user,data):
+    async def update_roles(self, id_user, data):
         async with await self.db.mongodb_client.start_session() as session:
             async with session.start_transaction():
-                await self.userCrud.update(value=id_role, config_data=data.dict(),session=session)
-                roles,_ = await self.roleCrud.get_all(query={'$or':[{'_id':{'$in':data.roles}},{'users':PyObjectId(id_user)}]})
+                await self.userCrud.update(value=id_role, config_data=data.dict(), session=session)
+                roles, _ = await self.roleCrud.get_all(query={'$or': [{'_id': {'$in': data.roles}}, {'users': PyObjectId(id_user)}]})
                 push_user_roles = []
                 pull_user_roles = []
                 for role in roles:
@@ -162,6 +168,6 @@ class UserController(metaclass=SingletonMeta):
                     if id_role in data.users and PyObjectId(id_role) not in role['users']:
                         push_user_roles.append(id_role)
                 if pull_user_roles != []:
-                    await self.roleCrud.pull_user(ids_role=pull_user_roles, id_user=id_user,session=session)
+                    await self.roleCrud.pull_user(ids_role=pull_user_roles, id_user=id_user, session=session)
                 if push_user_roles != []:
-                    await self.roleCrud.push_user(ids_role=push_user_roles, id_user=id_user,session=session)
+                    await self.roleCrud.push_user(ids_role=push_user_roles, id_user=id_user, session=session)

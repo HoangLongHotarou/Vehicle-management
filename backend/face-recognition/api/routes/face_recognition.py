@@ -1,13 +1,18 @@
-from fastapi import APIRouter, Depends, UploadFile, BackgroundTasks, File, status
+from fastapi import APIRouter, Depends, Query, UploadFile, BackgroundTasks, File, status
 from fastapi.responses import JSONResponse
-from api.controllers.controller import faceRecognitionController
-import numpy as np
+from typing import Union
+from api.controllers.controller import faceRecognitionCtrl
 from core.config import settings
+from api.tasks.worker import task_train, add
+from api.models.face_recognition_info import FaceRecognitionInfoListOut
+from api.models.options import TrainOptions
 from PIL import Image
+from utils.pagination import pagination_info
+import numpy as np
 import io
 import cv2
-from api.tasks.worker import task_train, add
 import base64
+import time
 
 router = APIRouter(
     prefix='/face-recognition',
@@ -16,35 +21,69 @@ router = APIRouter(
 )
 
 
-@router.post('/train')
-async def train(username: str, file: UploadFile):
-    # info = await faceRecognitionController.get_face(username)
-    # if info == None:
-    video_bytes = await file.read()
-    task_train.delay(video_bytes.hex(), username)
-    return JSONResponse(
-        status_code=status.HTTP_202_ACCEPTED,
-        content={
-            'detail': f'{username} đang được xử lý'
-        }
+@router.get('/get-info', response_model=FaceRecognitionInfoListOut)
+async def get_info(
+    page: int = Query(0, ge=0),
+    limit: int = Query(20, ge=0, le=20)
+):
+    faceRecognitionInfos, info = await faceRecognitionCtrl.infoCrud.get_all(
+        is_get_info=True,
+        page=page,
+        limit=limit
     )
-    # return JSONResponse(
-    #     status_code=status.HTTP_302_FOUND,
-    #     content={
-    #         'detail': f'{username} đã tồn tại trong dữ liệu nhận dạng khuôn mặt'
-    #     }
-    # )
+    dict = pagination_info(faceRecognitionInfos, info)
+    return dict
+
+
+@router.post('/train')
+async def train(
+    username: str,
+    file: UploadFile,
+    train_option: Union[TrainOptions, None] = None
+):
+    info = await faceRecognitionCtrl.get_face(username)
+    option = None if train_option == None else train_option.value
+    if info == None or option != None:
+        video_bytes = await file.read()
+        task_train.delay(
+            video_bytes.hex(), 
+            username, 
+            option, 
+            info
+        )
+        return JSONResponse(
+            status_code=status.HTTP_202_ACCEPTED,
+            content={
+                'detail': f'{username} đang được xử lý'
+            }
+        )
+    elif info.get('len_embs') != 0:
+        return JSONResponse(
+            status_code=status.HTTP_302_FOUND,
+            content={
+                'detail': f'{username} đã tồn tại trong dữ liệu nhận dạng khuôn mặt'
+            }
+        )
+    else:
+        return JSONResponse(
+            status_code=status.HTTP_302_FOUND,
+            content={
+                'detail': f'{username} đang train nếu 20 phút sau chưa có thì vui lòng train lại'
+            }
+        )
 
 
 @router.post('/recognition')
 async def recognition(file: bytes = File()):
+    start = time.time()
     img = Image.open(io.BytesIO(file))
     image = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
-    result = await faceRecognitionController.recognition(image)
-    return {'list': result}
+    result = await faceRecognitionCtrl.recognition(image)
+    end = time.time()
+    return {'list': result, 'time': float(end-start)}
 
 
-@router.delete('/remove_face/{username}')
+@router.delete('/remove-face/{username}')
 async def remove_face(username: str):
-    await faceRecognitionController.remove_face(username)
+    await faceRecognitionCtrl.remove_face(username)
     return {"test": "finish"}

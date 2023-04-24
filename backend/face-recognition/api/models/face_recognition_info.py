@@ -1,5 +1,6 @@
-from pydantic import BaseModel
 from typing import Optional, List
+from base.schema import PaginationInfo
+from base.models import BaseModel
 
 
 class FaceRecognitionInfo(BaseModel):
@@ -7,3 +8,7 @@ class FaceRecognitionInfo(BaseModel):
     hash_username: Optional[str]
     len_embs: Optional[int] = 0
     url: Optional[str]
+
+
+class FaceRecognitionInfoListOut(PaginationInfo):
+    list: List[FaceRecognitionInfo]

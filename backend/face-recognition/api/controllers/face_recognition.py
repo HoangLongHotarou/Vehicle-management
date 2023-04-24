@@ -17,15 +17,17 @@ class FaceRecognitionController(metaclass=SingletonMeta):
         self.infoCrud = InfoCrud()
         self.faceRecognition = FaceRecognition()
 
-    # async def get_face(self, username):
-    #     return await self.infoCrud.get(query={'username': username}, projection={'url': 1, 'embs': 1})
+    async def get_face(self, username):
+        return await self.infoCrud.get(
+            query={'username': username},
+            projection={'url': 1, 'embs': 1}
+        )
 
-    async def train(self, video_bytes, username):
-        info = await self.infoCrud.get(query={'username': username})
+    async def train(self, video_bytes, username, option, info):
         url = None
         id_info = None
         hash_username = hash_string2digit(username)
-        if info:
+        if info and option != None:
             url = info.get('url')
             id_info = info.get('_id')
         else:
@@ -73,6 +75,26 @@ class FaceRecognitionController(metaclass=SingletonMeta):
     #             names.append(info['username'])
     #     self.faceRecognition.reload_hnswlib(embs, names)
 
+    async def get_information(self, objs):
+        hash_usernames = [obj['hash_username'] for obj in objs]
+        usernames, _ = await self.infoCrud.get_all(
+            query={
+                'hash_username': {
+                    '$in': hash_usernames
+                }
+            },
+            projection={
+                'username': 1
+            }
+        )
+        result = []
+        for i, obj in enumerate(objs):
+            obj.pop('hash_username')
+            obj['username'] = usernames[i]['username']
+            result.append(obj)
+        return result
+
     async def recognition(self, image):
-        result = self.faceRecognition.predict(image)
+        objs = self.faceRecognition.predict(image)
+        result = await self.get_information(objs)
         return result

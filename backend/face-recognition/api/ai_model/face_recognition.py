@@ -19,9 +19,7 @@ class FaceRecognition():
         self.resnet = InceptionResnetV1(pretrained='vggface2').eval()
         self.max_elements = settings.MAX_ELEMENTS
         self.p = None
-
-    def trans_for_train(self, img):
-        trans = transforms.Compose([
+        self.trans_data_augmentation = transforms.Compose([
             transforms.Resize((160, 160)),
             transforms.RandomHorizontalFlip(p=0.5),
             transforms.RandomRotation(degrees=10),
@@ -30,15 +28,17 @@ class FaceRecognition():
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
         ])
-        return trans(img).unsqueeze(0)
-
-    def trans_for_recognition(self, img):
-        trans = transforms.Compose([
+        self.trans_default = transforms.Compose([
             transforms.Resize((160, 160)),
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
         ])
-        return trans(img).unsqueeze(0)
+
+    def trans_for_train(self, img):
+        return self.trans_data_augmentation(img).unsqueeze(0)
+
+    def trans_for_recognition(self, img):
+        return self.trans_default(img).unsqueeze(0)
 
     def train(self, url):
         vicap = cv2.VideoCapture(url)
@@ -60,6 +60,7 @@ class FaceRecognition():
                 bbox = list(map(int, box.tolist()))
                 if min(bbox) < 0:
                     continue
+                # bbox = [x1,y1,x2,y2]
                 image = image[bbox[1]:bbox[3], bbox[0]:bbox[2]]
                 im_pil = Image.fromarray(image)
                 face = self.trans_for_train(im_pil)
@@ -71,14 +72,6 @@ class FaceRecognition():
                     embs.append(emb.numpy()[0].tolist())
         vicap.release()
         return embs
-
-    # def load_names(self):
-    #     saved_data = torch.load('data_file/names.pt')
-    #     names = saved_data[0]
-    #     return names
-
-    # def save_names(self,names):
-    #     torch.save([names], 'data_file/names.pt')
 
     def continue_train(self, embs, hash_username):
         p = hnswlib.Index(space='l2', dim=512)
@@ -108,14 +101,6 @@ class FaceRecognition():
             p.mark_deleted(int(f'{hash_username}{i:02}'))
         p.save_index('data_file/embedding.bin')
 
-    # def reload_hnswlib(self, embs, names):
-    #     lg = len(names)
-    #     p = hnswlib.Index(space='l2', dim=512)
-    #     p.init_index(max_elements=lg, ef_construction=200, M=16)
-    #     p.add_items(embs, np.arange(0, lg))
-    #     p.save_index('data_file/embedding.bin')
-    #     torch.save([names], 'data_file/names.pt')
-
     def predict(self, image):
         self.p = hnswlib.Index(space='l2', dim=512)
         self.p.load_index(
@@ -141,7 +126,10 @@ class FaceRecognition():
                     int2str = str(labels[0][0])
                     hash_username = int2str[:8]
                     results.append(
-                        {'username': hash_username, 'distance': float(
-                            distance), 'coordinate': bbox}
+                        {
+                            'hash_username': hash_username,
+                            'distance': float(distance),
+                            'coordinate': bbox
+                        }
                     )
         return results

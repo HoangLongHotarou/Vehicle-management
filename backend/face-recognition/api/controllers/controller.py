@@ -1,3 +1,3 @@
 from .face_recognition import FaceRecognitionController
 
-faceRecognitionController = FaceRecognitionController()
+faceRecognitionCtrl = FaceRecognitionController()
