@@ -1,0 +1,100 @@
+[{
+  "_id": {
+    "$oid": "6396ea0c525a8def370fcbd3"
+  },
+  "id_user": {
+    "$oid": "6338ece5592aa1ac1606bd94"
+  },
+  "id_entrance_auth": {
+    "$oid": "63948266198c29f9c21005fa"
+  },
+  "enable": true
+},{
+  "_id": {
+    "$oid": "639aa62596d05526737b50a5"
+  },
+  "id_user": {
+    "$oid": "6338ece5592aa1ac1606bd94"
+  },
+  "id_entrance_auth": {
+    "$oid": "639a9f52a24ddfd4c36e69e0"
+  },
+  "enable": true
+},{
+  "_id": {
+    "$oid": "639aaac696d05526737b50a6"
+  },
+  "id_user": {
+    "$oid": "63580cc8e583c0cb73714875"
+  },
+  "id_entrance_auth": {
+    "$oid": "6394827d198c29f9c21005fb"
+  },
+  "enable": true
+},{
+  "_id": {
+    "$oid": "639aab5d96d05526737b50a7"
+  },
+  "id_user": {
+    "$oid": "63580cc8e583c0cb73714876"
+  },
+  "id_entrance_auth": {
+    "$oid": "63948266198c29f9c21005fa"
+  },
+  "enable": true
+},{
+  "_id": {
+    "$oid": "63a6bf1b83c0312cb735c52f"
+  },
+  "id_user": {
+    "$oid": "63414411225d597d60a135e1"
+  },
+  "id_entrance_auth": {
+    "$oid": "633eab8169d18929cf048b85"
+  },
+  "enable": true
+},{
+  "_id": {
+    "$oid": "63a6bf7383c0312cb735c531"
+  },
+  "id_user": {
+    "$oid": "63414411225d597d60a135e1"
+  },
+  "id_entrance_auth": {
+    "$oid": "6394827d198c29f9c21005fb"
+  },
+  "enable": true
+},{
+  "_id": {
+    "$oid": "63b6e7eb55faf496598c5b77"
+  },
+  "id_user": {
+    "$oid": "6340f27cd7d307b7a48d6e9c"
+  },
+  "enable": true,
+  "id_entrance_auth": {
+    "$oid": "63948266198c29f9c21005fa"
+  }
+},{
+  "_id": {
+    "$oid": "63b7705fa73d4122fd598897"
+  },
+  "id_user": {
+    "$oid": "63b7705ed4b6319b085ec9e7"
+  },
+  "enable": true,
+  "id_entrance_auth": {
+    "$oid": "63948266198c29f9c21005fa"
+  }
+},{
+  "_id": {
+    "$oid": "645b3e8e01e799055ada99a8"
+  },
+  "id_user": {
+    "$oid": "645b3e8ea62fe10629bccbda"
+  },
+  "enable": true,
+  "id_entrance_auth": {
+    "$oid": "63948266198c29f9c21005fa"
+  }
+}]

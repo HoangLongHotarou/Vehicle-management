@@ -18,8 +18,8 @@ class ConstValue(BaseSettings):
     MAX_ELEMENTS = 100000
 
 class DatabaseSettings(BaseSettings):
-    DB_URL: str = os.environ.get(
-        'MONGODB_URL', 'mongodb+srv://dbRon:Long12345@cluster0.w09ru.mongodb.net/test')
+    DB_URL: str = os.environ.get('MONGODB_URL', 'mongodb+srv://dbRon:Long12345@cluster0.w09ru.mongodb.net/test')
+    # DB_URL: str = os.environ.get('mongodb://host.docker.internal:27017/?replicaSet=rs0&directConnection=true')
     DB_NAME: str = os.environ.get('MONGODB_NAME', 'face_recognition_db')
 
 

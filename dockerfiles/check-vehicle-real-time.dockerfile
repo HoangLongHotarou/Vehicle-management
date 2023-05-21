@@ -10,7 +10,7 @@ COPY ./backend/check-vehicle-real-time/requirements.txt .
 
 RUN pip install --no-cache-dir -r /check-vehicle-real-time/requirements.txt
 
-COPY ./backend/license-plate-app .
+COPY ./backend/check-vehicle-real-time .
 
 CMD [ "python", "main.py" ]
 

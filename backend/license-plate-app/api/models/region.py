@@ -12,6 +12,7 @@ from .in_and_out_time import Type
 class CameraRTSPModel(BaseModel):
     name: Optional[str]
     rtsp_url: Optional[AnyUrl]
+    face_rtsp_url:  Optional[str] = 0
     type: Optional[Type]
 
 class RegionType(str,Enum):

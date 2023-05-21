@@ -4,8 +4,12 @@ import re
 def detection(yolo: BaseYOLO, image):
     for (x0,y0,x1,y1,score,label) in yolo.predict(image):
         if score <= 0.5: continue
-        # yield image[y0:y1,x0:x1]
         yield (x0,y0,x1,y1)
+
+def detection_one_object(yolo: BaseYOLO, image):
+    for (x0,y0,x1,y1,score,label) in yolo.predict(image):
+        if score <= 0.5: return None
+        return (x0,y0,x1,y1)
 
 def recognize(yolo: BaseYOLO, image):
     coordinates_matrix = []

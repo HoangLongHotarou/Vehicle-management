@@ -4,6 +4,7 @@ from enum import Enum
 from typing import Union
 
 from api.models.in_and_out import (InAndOutModelListOutV2, Search, SelectType)
+from api.models.check_exist_face import CheckExistFace
 from fastapi import (APIRouter, BackgroundTasks, File, Form, Query,
                      UploadFile, WebSocket, Request)
 from api.models.vehicle import VehicleType
@@ -56,16 +57,34 @@ async def check_turn_in_out(
     )
     return data
 
-@router.post('/check_turn_in_out_realtime')
+@router.post('/check_turn_in_out_realtime/one_object')
 async def check_turn_in_out_realtime(
     check: CheckInAndOutSchema
 ):
-    check = check.dict()
-    data = await inAndOutCtrl.check_vehicle_realtime_v2(
-        plates_json=check['plates'], 
-        id_region=check['id_region'], 
-        turn=check['turn'])
+    # check.plate, check.id_region = "49E1-22222", '633eab6969d18929cf048b83'
+    data = await inAndOutCtrl.check_vehicle_realtime_for_one_user(
+        plates_json=check.plates,
+        id_region=check.id_region, 
+        turn=check.turn
+    )
     return data
+
+@router.post('/mark_face')
+async def mark_face(
+    check: CheckExistFace
+):
+    data = await inAndOutCtrl
+
+# @router.post('/check_turn_in_out_realtime')
+# async def check_turn_in_out_realtime(
+#     check: CheckInAndOutSchema
+# ):
+#     check = check.dict()
+#     data = await inAndOutCtrl.check_vehicle_realtime_for_one_user(
+#         plates_json=check['plates'], 
+#         id_region=check['id_region'], 
+#         turn=check['turn'])
+#     return data
 
 @router.get('/test')
 async def test():

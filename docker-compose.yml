@@ -1,8 +1,42 @@
 version: '3.8'
 
 services:
+  mongo1:
+    hostname: mongo1
+    image: mongo
+    ports:
+      - 27017:27017
+    restart: always
+    command: mongod --replSet rs0
+  mongo2:
+    hostname: mongo2
+    image: mongo
+    restart: always
+    command: mongod --replSet rs0
+  mongo3:
+    hostname: mongo3
+    image: mongo
+    restart: always
+    command: mongod --replSet rs0
+  mongoinit:
+    image: mongo
+    command: >
+      mongosh --host mongo1:27017 --eval  '
+        rs.initiate( {
+        _id : "rs0",
+        members: [
+            { _id: 0, host: "mongo1:27017" },
+            { _id: 1, host: "mongo2:27017" },
+            { _id: 2, host: "mongo3:27017" }
+        ]
+      })' 
+    depends_on:
+      - mongo1
+      - mongo2
+      - mongo3
+
   auth_service:
-    build: 
+    build:
       context: .
       dockerfile: dockerfiles/auth.dockerfile
     image: hotaroudazai/auth-license-plate
@@ -10,28 +44,19 @@ services:
       - ./backend/auth:/auth
     env_file:
       - ./env/auth.env
+    restart: always
     ports:
       - '8001:8000'
   ai_service:
-    build: 
+    build:
       context: .
       dockerfile: dockerfiles/yolo-license-plate.dockerfile
     image: hotaroudazai/yolo-license-plate
     volumes:
       - ./backend/yolo-license-plate:/yolo-license-plate
+    restart: always
     ports:
       - '8002:8000'
-  face_recognition_service:
-    build: 
-      context: .
-      dockerfile: dockerfiles/face-recognition.dockerfile
-    image: hotaroudazai/face-recognition
-    volumes:
-      - ./backend/face-recognition:/face-recognition
-    env_file:
-      - ./env/face-recognition.env
-    ports:
-      - '8005:8000'
   app_service:
     build:
       context: .
@@ -55,16 +80,37 @@ services:
       - ./backend/check-vehicle-real-time:/check-vehicle-real-time
     ports:
       - '8004:8000'
+  face_recognition_service:
+    build:
+      context: .
+      dockerfile: dockerfiles/face-recognition.dockerfile
+    image: hotaroudazai/face-recognition
+    volumes:
+      - ./backend/face-recognition:/face-recognition
+    restart: always
+    env_file:
+      - ./env/face-recognition.env
+    ports:
+      - '8005:8000'
+  # check_face_service:
+  #   build:
+  #     context: .
+  #     dockerfile: dockerfiles/check-face-real-time.dockerfile
+  #   image: hotaroudazai/check-face-real-time
+  #   volumes:
+  #     - ./backend/check-face-real-time:/check-face-real-time
+  #   ports:
+  #     - '8006:8000'
   redis:
     image: redis:alpine3.16
     ports:
       - '6379:6379'
-  frontend:
-    build:
-      context: .
-      dockerfile: dockerfiles/frontend.dockerfile
-    volumes:
-      - react_build:/react/build
+  # frontend:
+  #   build:
+  #     context: .
+  #     dockerfile: dockerfiles/frontend.dockerfile
+  #   volumes:
+  #     - react_build:/react/build
   nginx:
     build:
       context: .
@@ -80,7 +126,7 @@ services:
       - auth_service
       - app_service
       - ai_service
-      - frontend
+      # - frontend
       # - check_vehicle_service
   worker:
     image: hotaroudazai/face-recognition

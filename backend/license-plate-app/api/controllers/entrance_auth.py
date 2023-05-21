@@ -1,4 +1,4 @@
-from api.services.crud import EntranceAuth, EntranceAuthRegion, EntranceAuthUser
+from api.services.crud import EntranceAuth, EntranceAuthRegion, EntranceAuthUserCrud
 from api.services.fetchapi import FetchAuthAPI
 from utils.singleton import SingletonMeta
 from utils.pyobjectid import PyObjectId
@@ -8,7 +8,7 @@ class EntranceAuthController(metaclass=SingletonMeta):
     def __init__(self):
         self.entranceAuthCrud = EntranceAuth()
         self.entranceAuthRegionCrud = EntranceAuthRegion()
-        self.entranceAuthUserCrud = EntranceAuthUser()
+        self.entranceAuthUserCrud = EntranceAuthUserCrud()
         self.fetchAuth = FetchAuthAPI()
     
     async def get_all_entrance_auth(self,page,limit):

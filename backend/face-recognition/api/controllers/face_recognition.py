@@ -1,5 +1,6 @@
 from utils.singleton import SingletonMeta
 from api.services.crud import InfoCrud
+from api.services.fetchapi import FetchAuthAPI
 from api.ai_model.face_recognition import FaceRecognition
 from core.config import settings
 from api.models.face_recognition_info import FaceRecognitionInfo
@@ -16,6 +17,7 @@ class FaceRecognitionController(metaclass=SingletonMeta):
     def __init__(self):
         self.infoCrud = InfoCrud()
         self.faceRecognition = FaceRecognition()
+        self.fetchAuth = FetchAuthAPI()
 
     async def get_face(self, username):
         return await self.infoCrud.get(
@@ -96,5 +98,10 @@ class FaceRecognitionController(metaclass=SingletonMeta):
 
     async def recognition(self, image):
         objs = self.faceRecognition.predict(image)
+        result = await self.get_information(objs)
+        return result
+
+    async def recognition_one_user(self,image):
+        objs = self.faceRecognition.predict_one_user(image)
         result = await self.get_information(objs)
         return result

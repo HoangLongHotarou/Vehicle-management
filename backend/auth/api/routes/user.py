@@ -164,6 +164,14 @@ async def system_get_user(id_user: str, key: str):
     user = await userCtrl.userCrud.get(value=id_user)
     return user
 
+@router.get('/get_user_by_username/{username}', response_model=UserModelOut)
+async def system_get_user_by_username(username: str, key: str):
+    if key != settings.PATH_KEY:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail='key not allow')
+    user = await userCtrl.userCrud.get(query={'username': username})
+    return user
+
 @router.post('/get_user_list', response_model=List[UserModelOut])
 async def system_get_user_list(ids_user: List[PyObjectId], key: str):
     # userCtrl = UserController()

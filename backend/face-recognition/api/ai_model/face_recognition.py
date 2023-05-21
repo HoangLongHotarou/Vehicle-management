@@ -16,6 +16,8 @@ class FaceRecognition():
             'cuda:0' if torch.cuda.is_available() and gpu else 'cpu')
         self.mtcnn = MTCNN(
             thresholds=[0.7, 0.7, 0.8], keep_all=True, device=self.device)
+        self.mtcnn_one_box = MTCNN(
+            thresholds=[0.7, 0.7, 0.8], keep_all=False, device=self.device)
         self.resnet = InceptionResnetV1(pretrained='vggface2').eval()
         self.max_elements = settings.MAX_ELEMENTS
         self.p = None
@@ -102,15 +104,17 @@ class FaceRecognition():
         p.save_index('data_file/embedding.bin')
 
     def predict(self, image):
+        results = []
         self.p = hnswlib.Index(space='l2', dim=512)
         self.p.load_index(
             'data_file/embedding.bin',
             max_elements=self.max_elements
         )
+        if image is None:
+            return results
         img = image
         img = img[:, :, ::-1]
         boxes, _ = self.mtcnn.detect(img)
-        results = []
         if boxes is not None:
             for box in boxes:
                 bbox = list(map(int, box.tolist()))
@@ -120,9 +124,8 @@ class FaceRecognition():
                 emb = self.resnet(face).detach()
                 labels, distances = self.p.knn_query(emb, k=1)
                 distance = distances[0][0]
-                recognized = 'unknown'
                 if distance < 0.55:
-                    print(distance)
+                    # print(distance)
                     int2str = str(labels[0][0])
                     hash_username = int2str[:8]
                     results.append(
@@ -132,4 +135,38 @@ class FaceRecognition():
                             'coordinate': bbox
                         }
                     )
+        return results
+
+    def predict_one_user(self, image):
+        results = []
+        self.p = hnswlib.Index(space='l2', dim=512)
+        self.p.load_index(
+            'data_file/embedding.bin',
+            max_elements=self.max_elements
+        )
+        if image is None:
+            return results
+        img = image
+        img = img[:, :, ::-1]
+        boxes, _ = self.mtcnn_one_box.detect(img)
+        if boxes is not None:
+            box = boxes[0]
+            bbox = list(map(int, box.tolist()))
+            img_region = img[bbox[1]:bbox[3], bbox[0]:bbox[2]]
+            im_pil = Image.fromarray(img_region)
+            face = self.trans_for_recognition(im_pil)
+            emb = self.resnet(face).detach()
+            labels, distances = self.p.knn_query(emb, k=1)
+            distance = distances[0][0]
+            if distance < 0.55:
+                # print(distance)
+                int2str = str(labels[0][0])
+                hash_username = int2str[:8]
+                results.append(
+                    {
+                        'hash_username': hash_username,
+                        'distance': float(distance),
+                        'coordinate': bbox
+                    }
+                )
         return results

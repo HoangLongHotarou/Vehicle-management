@@ -1,6 +1,5 @@
 import json
 import math
-
 from fastapi import HTTPException, Request
 from utils.pyobjectid import PyObjectId
 from utils.singleton import SingletonMeta

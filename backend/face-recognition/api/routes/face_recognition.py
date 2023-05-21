@@ -73,7 +73,34 @@ async def train(
         )
 
 
+@router.post('/recognition/one-user')
+async def recognition_one_user(file: bytes = File()):
+    start = time.time()
+    image_base64 = np.fromstring(base64.b64decode(file), dtype=np.uint8)
+    image_base64 = cv2.imdecode(image_base64, cv2.IMREAD_ANYCOLOR)
+    result = await faceRecognitionCtrl.recognition_one_user(image_base64)
+    end = time.time()
+    return {'list': result, 'time': float(end-start)}
+
+@router.post('/recognition/one-user/test')
+async def recognition_one_user(file: bytes = File()):
+    start = time.time()
+    img = Image.open(io.BytesIO(file))
+    image = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
+    result = await faceRecognitionCtrl.recognition_one_user(image)
+    end = time.time()
+    return {'list': result, 'time': float(end-start)}
+
 @router.post('/recognition')
+async def recognition(file: bytes = File()):
+    start = time.time()
+    image_base64 = np.fromstring(base64.b64decode(file), dtype=np.uint8)
+    image_base64 = cv2.imdecode(image_base64, cv2.IMREAD_ANYCOLOR)
+    result = await faceRecognitionCtrl.recognition(image_base64)
+    end = time.time()
+    return {'list': result, 'time': float(end-start)}
+
+@router.post('/recognition/test')
 async def recognition(file: bytes = File()):
     start = time.time()
     img = Image.open(io.BytesIO(file))
@@ -81,7 +108,6 @@ async def recognition(file: bytes = File()):
     result = await faceRecognitionCtrl.recognition(image)
     end = time.time()
     return {'list': result, 'time': float(end-start)}
-
 
 @router.delete('/remove-face/{username}')
 async def remove_face(username: str):

@@ -3,7 +3,9 @@ from datetime import datetime
 
 from api.models.in_and_out import InAndOutModel
 from api.models.in_and_out_time import InAndOutTimeModel
-from api.services.crud import (InAndOutCrud, InAndOutTimeCrud, RegionCrud,VehicleCrud)
+from api.models.check_exist_face import CheckExistFace
+from api.services.crud import (InAndOutCrud, InAndOutTimeCrud, RegionCrud,VehicleCrud, 
+                            CheckExistFaceCrud, EntranceAuthUserCrud)
 from api.services.fetchapi import FetchAuthAPI, FetchYoloAPI
 from pymongo import IndexModel
 from pytz import timezone
@@ -20,6 +22,8 @@ class InAndOutController(metaclass=SingletonMeta):
         self.vehicleCrud = VehicleCrud()
         self.regionCrud = RegionCrud()
         self.fetchYoloAPI = FetchYoloAPI()
+        self.checkExistFaceCrud = CheckExistFaceCrud()
+        self.entranceAuthUserCrud = EntranceAuthUserCrud()
         self.fetchAuth = FetchAuthAPI()
     
     async def predict(self,image):
@@ -90,6 +94,54 @@ class InAndOutController(metaclass=SingletonMeta):
                 else:
                     ids.append(PyObjectId(in_and_out['_id']))
         return ids,add_in_and_out,in_and_out_time_ids,vehicle_has_been_turn
+    
+    async def _mark_in_and_out_for_one_user(self,turn,data,id_region,date):
+        time = {
+            'time':str(date.time()),
+            'type':turn
+        }
+        
+        add_in_and_out = None
+        in_and_out_time_id = None
+        in_and_out_id = None
+        vehicle_has_been_turn = None
+        
+        in_and_out = data.get('in_and_out')
+        
+        if in_and_out == None:
+            add_in_and_out = {
+                    'id_vehicle':PyObjectId(data.get('_id')),
+                    'id_region':PyObjectId(id_region)
+            }
+            in_and_out = await self.inAndOutCrud.add(data=add_in_and_out)
+        in_and_out_time = in_and_out.get('in_and_out_time',None)
+        if in_and_out_time:
+            if(
+                len(in_and_out_time['times'])>0 and
+                in_and_out_time['times'][-1]['type'] == turn
+            ):
+                vehicle_has_been_turn = {
+                        'date':in_and_out_time['date'],
+                        'time': in_and_out_time['times'][-1]['time']
+                    }
+                return False, vehicle_has_been_turn
+            elif in_and_out_time['date'] == date:
+                in_and_out_time_id = in_and_out_time['_id']
+                await self.inAndOutTimeCrud.push_times_one_user(in_and_out_time_id,time)
+            else:
+                in_and_out_id = PyObjectId(in_and_out['_id'])
+        else:
+            in_and_out_id = PyObjectId(in_and_out['_id'])
+        if in_and_out_id:
+            in_and_out_time_obj = {
+                'id_in_and_out':in_and_out_id,
+                'date': str(date.date()),
+                'times':[
+                    time
+                ]
+            }
+            await self.inAndOutTimeCrud.add(in_and_out_time_obj)
+        return True, None
     
     
     async def _dotting_in_and_out(
@@ -201,7 +253,7 @@ class InAndOutController(metaclass=SingletonMeta):
         data_list = await self.vehicleCrud.filter_role_access(plates,id_region)
         return "ehehe"
 
-    async def check_vehicle_realtime(self,plates_json,id_region,turn):
+    async def check_vehicle_realtime(self,plate_json,id_region,turn):
         date = datetime.now(tz)
         if plates_json == []:
             return []
@@ -330,6 +382,99 @@ class InAndOutController(metaclass=SingletonMeta):
                 } 
                 vehicle_information.append(object)
         return {"register":vehicle_information,"not_registered":unknown_plates,"turn":turn}
+    
+    async def return_data(self, register, not_register, warning, turn):
+        return {"register": register,"not_registered": not_register,"warning": warning,"turn": turn}
+    
+    async def check_vehicle_realtime_for_one_user(self,plates_json,id_region,turn):
+        vehicle_information = []
+        role_plates = {}
+        # unknown_plates = []
+        register = []
+        not_register = []
+        warning = []
+
+        date = datetime.now(tz)
+        if plates_json == []:
+            return []
+        plate = plates_json[0].plate
+
+        data = await self.vehicleCrud.filter_role_access_for_one_user(plate, id_region)
+        if not data:
+            not_register.append(
+                {
+                    'plate': plate,
+                    'information': 'vehicle not yet registered'
+                }
+            )
+            return self.return_data(register, not_register, warning, turn)
+        
+        user = await self.fetchAuth.get_user(data['user_id'])
+        username = user['username']
+        
+        check = await self.is_exist_face(username, id_region)
+        
+        if not check:
+            warning.append(
+                {
+                    'plate': plate,
+                    'type': data['type'],
+                    'owner': data['username'],
+                    'information': "Unauthorized driver detected"
+                }
+            )
+            return self.return_data(register, not_register, warning, turn)
+        
+        role = await self.entranceAuthUserCrud.get_role_for_user(id_user=data['user_id'])
+        
+        if not data['entrance_auth_user']:
+            warning.append({
+                'plate': plate,
+                'type': data['type'],
+                'username': data['username'],
+                'role': role,
+                'information': "Warning! Unauthorized vehicle approaching"
+            })
+            return self.return_data(register, not_register, warning, turn)
+
+        data_vehicle = await self.vehicleCrud.filter_detail_vehicle_v2_for_one_user(plate,id_region,str(date.date()))
+
+        check, vehicle_has_been_turn = await self._mark_in_and_out_for_one_user(turn, data_vehicle, id_region, date)
+        
+        if not vehicle_has_been_turn:
+            info = {
+                'message': f'turn {turn}',
+                'date': str(date.date()),
+                'time': str(date.time())
+            }
+        else:
+            info = {
+                'message': f"already {turn}",
+                'date': vehicle_has_been_turn['date'],
+                'time': vehicle_has_been_turn['time']
+            }
+        register.append(
+            { 
+                'username':ids_names.get(data['user_id'],'unknown'),
+                'plate':data['plate'],
+                'role': role,
+                'coordinate': dict_plates[data['plate']],
+                'information': info,
+            } 
+        )
+        return self.return_data(register, not_register, warning, turn)
+    
+    async def add_username_to_exist_face(self,username, id_region):
+        data = await self.checkExistFaceCrud.get(query={'username':username, 'id_region':id_region})
+        if data == None:
+            data = await self.checkExistFaceCrud.add(
+                CheckExistFace(username=username,id_region=id_region, created_at= datetime.utcnow()).dict()
+            )
+        return data
+    
+    async def is_exist_face(self,username, id_region):
+        data = await self.checkExistFaceCrud.get(query={'username':username, 'id_region': id_region})
+        return True if data else False
     
     def calculate_reduce_date(self,date_split):
         date_split[2] -= 1

@@ -30,7 +30,8 @@ class JWTSettings(BaseSettings):
 class RedisSettings(BaseSettings):
     REDIS_BROKER: str = os.environ.get('REDIS_URL')
     REDIS_BACKEND: str = os.environ.get(
-        'REDIS_URL', 'redis://localhost:6379/0')
+        'REDIS_URL', 'redis://localhost:6379/0'
+    )
 
 
 class Settings(CommonSettings, ServerSettings, DatabaseSettings, JWTSettings, RedisSettings):

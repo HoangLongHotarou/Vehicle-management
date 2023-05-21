@@ -48,7 +48,7 @@ class VehicleCrud(BaseCrud):
                                             'pipeline':[
                                                 {
                                                     '$match':{
-                                                        'id_region': id_region
+                                                        'id_region': PyObjectId(id_region)
                                                     }
                                                 }
                                             ]
@@ -82,6 +82,74 @@ class VehicleCrud(BaseCrud):
         async for data in result:
             list.append(data)
         return list
+    
+    async def filter_role_access_for_one_user(self,plate,id_region):
+        pipeline = [
+            {
+                '$match':{
+                    'plate': plate
+                }
+            },
+            {
+                '$lookup':{
+                    'from':'license_plate_entrance_auth_user',
+                    'localField':'user_id',
+                    'foreignField':'id_user',
+                    'as':'entrance_auth_user',
+                    'pipeline':[
+                        {
+                            '$lookup':{
+                                'from':'license_plate_entrance_auth',
+                                'localField':'id_entrance_auth',
+                                'foreignField':'_id',
+                                'as':'entrance_auth',
+                                'pipeline':[
+                                    {
+                                        '$lookup':{
+                                            'from':'license_plate_entrance_auth_region',
+                                            'localField':'_id',
+                                            'foreignField':'id_entrance_auth',
+                                            'as':'entrance_auth_region',
+                                            'pipeline':[
+                                                {
+                                                    '$match':{
+                                                        'id_region': PyObjectId(id_region)
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        '$unwind':'$entrance_auth_region'
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            '$unwind':'$entrance_auth'
+                        }
+                    ]
+                }
+            },
+            # {
+            #     '$unwind':'$entrance_auth_user'
+            # },
+            {
+                '$project':{
+                    '_id':1,
+                    'plate':1,
+                    'user_id':1,
+                    'type': 1,
+                    'entrance_auth_user.entrance_auth.name':1
+                }
+            }
+        ]
+        result_ls = self.db.mongodb[self.model].aggregate(pipeline)
+        result = None
+        async for data in result_ls:
+            result = data
+        return result
+    
     
     async def filter_detail_vehicle(self,plates,id_region,date):
         pipeline=[
@@ -158,6 +226,74 @@ class VehicleCrud(BaseCrud):
             if data['user_id'] != None:
                 ids_user.append(str(data['user_id']))
         return list,ids_user
+    
+    async def filter_detail_vehicle_for_one_user(self,plate,id_region,date):
+        pipeline=[
+            {
+                '$match':{
+                    'plate': plate
+                }
+            },
+            {
+                '$lookup':{
+                    'from':'license_plate_in_and_out',
+                    'localField':'_id',
+                    'foreignField':'id_vehicle',
+                    'as':'in_and_out',
+                    'pipeline':[
+                        {
+                            '$match':{
+                                'id_region':id_region
+                            }
+                        },
+                        {
+                            '$lookup':{
+                                'from':'license_plate_region',
+                                'localField': 'id_region',
+                                'foreignField': '_id',
+                                'as':'region',
+                                'pipeline': [
+                                    {
+                                        '$project':{
+                                            'type':0,
+                                            'coordinate':0,
+                                            'acceptance_roles':0
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            '$unwind':'$region'
+                        },
+                        {
+                            '$lookup':{
+                                'from':'license_plate_in_and_out_time',
+                                'localField':'_id',
+                                'foreignField':'id_in_and_out',
+                                'as':'in_and_out_times',
+                                'pipeline':[
+                                    {
+                                        '$match':{'date':date}
+                                    }
+                                ]
+                            },
+                        }
+                    ]
+                }
+            },
+            {
+                '$unwind':{
+                    'path':'$in_and_out',
+                    'preserveNullAndEmptyArrays':True
+                }
+            }
+        ]
+        result_ls = self.db.mongodb[self.model].aggregate(pipeline)
+        result = {}
+        async for data in result_ls:
+            result = data
+        return result
     
     async def filter_detail_vehicle_v3(self,ids_plates,id_region,date):
         pipeline=[
@@ -262,7 +398,6 @@ class VehicleCrud(BaseCrud):
                                             "date":{                          
                                                 '$lte': date
                                             }
-                                            # "date":date
                                         }
                                     },
                                     {
@@ -299,7 +434,73 @@ class VehicleCrud(BaseCrud):
                 ids_user.append(str(data['user_id']))
         return list,ids_user
     
-    
+    async def filter_detail_vehicle_v2_for_one_user(self,plate,id_region,date):
+        pipeline=[
+            {
+                '$match':{
+                    'plate':{
+                        "$in":plate
+                    }
+                }
+            },
+            {
+                '$lookup':{
+                    'from':'license_plate_in_and_out',
+                    'localField':'_id',
+                    'foreignField':'id_vehicle',
+                    'as':'in_and_out',
+                    'pipeline':[
+                        {
+                            '$match':{
+                                'id_region':id_region
+                            }
+                        },
+                        {
+                            '$lookup':{
+                                'from':'license_plate_in_and_out_time',
+                                'localField':'_id',
+                                'foreignField':'id_in_and_out',
+                                'as':'in_and_out_time',
+                                'pipeline':[
+                                    {
+                                        '$match':{
+                                            "date":{                          
+                                                '$lte': date
+                                            }
+                                        }
+                                    },
+                                    {
+                                        '$sort': {"date": -1}
+                                    },
+                                    {
+                                        '$limit':1
+                                    }
+                                ]
+                            },
+                        },
+                        {
+                            '$unwind':{
+                                'path':'$in_and_out_time',
+                                'preserveNullAndEmptyArrays':True
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                '$unwind':{
+                    'path':'$in_and_out',
+                    'preserveNullAndEmptyArrays':True
+                }
+            }
+        ]
+        result_ls = self.db.mongodb[self.model].aggregate(pipeline)
+        result = {}
+        async for data in result_ls:
+            result = data
+            break
+        return result
+
 
 class RegionCrud(BaseCrud):
     def __init__(self):
@@ -308,6 +509,10 @@ class RegionCrud(BaseCrud):
 class InAndOutCrud(BaseCrud):
     def __init__(self):
         super().__init__(f'{app}_in_and_out')
+    
+    async def add(self,data):
+        await self.set_unique([('id_vehicle',1),('id_region',1)])
+        return await super().add(data)
     
     async def add_in_and_out_list(self,data):
         await self.set_unique([('id_vehicle',1),('id_region',1)])
@@ -532,6 +737,16 @@ class InAndOutTimeCrud(BaseCrud):
         index2 = IndexModel([('times.time',-1)])
         await self.set_multi_key([index1,index2])
     
+    async def push_times_one_user(self,id,time):
+        await self.db.mongodb[self.model].update_many(
+            {
+                self.key: id
+            },
+            {
+                '$push':{'times':time}
+            }
+        )
+    
     async def push_times(self,ids,time):
         await self.db.mongodb[self.model].update_many(
             {
@@ -541,6 +756,10 @@ class InAndOutTimeCrud(BaseCrud):
                 '$push':{'times':time}
             }
         )
+
+    async def add(self,data):
+        await self.create_query_index()
+        await super().add(data)
     
     async def create_in_and_out_time(self,data):
         await self.create_query_index()
@@ -702,7 +921,7 @@ class EntranceAuthRegion(BaseCrud):
                 list=data
         return list 
 
-class EntranceAuthUser(BaseCrud):
+class EntranceAuthUserCrud(BaseCrud):
     def __init__(self):
         super().__init__(f'{app}_entrance_auth_user')
     
@@ -712,6 +931,37 @@ class EntranceAuthUser(BaseCrud):
         # await self.set_multi_key([index1, index2])
         await self.set_unique([('id_entrance_auth', 1),('id_user', 1)])
         return await super().add(data)    
+    
+    async def get_role_for_user(self, id_user):
+        pipeline = [
+            {
+                '$match':{
+                    'id_user': id_user
+                }
+            },
+            {
+                '$lookup':{
+                    'from':'license_plate_entrance_auth',
+                    'localField':'id_entrance_auth',
+                    'foreignField':'_id',
+                    'as':'entrance_auth',
+                },
+            },
+            {
+                    '$unwind':'$entrance_auth'
+            },
+            {
+                '$project':{
+                    '_id':0,
+                    'entrance_auth.name':1
+                }
+            }
+        ]
+        result_ls = self.db.mongodb[self.model].aggregate(pipeline)
+        result = []
+        async for data in result_ls:
+            result.append(data)
+        return result
     
     async def get_all_entrance_auth_user(self,skip,limit):
         pipeline = [
@@ -770,4 +1020,16 @@ class EntranceAuthUser(BaseCrud):
             else:
                 data['pages_size'] = math.ceil(data['total']/limit) if limit > 0 else 0
                 list=data
-        return list 
+        return list
+
+
+class CheckExistFaceCrud(BaseCrud):
+    def __init__(self):
+        super().__init__(f'{app}_check_face_and_plate')
+
+    async def create_expire(self):
+        await self.db.mongodb[self.model].create_index('created_at', expireAfterSeconds=120)
+
+    async def add(self, data, session=None):
+        await self.create_expire()
+        return await super().add(data, session=session)

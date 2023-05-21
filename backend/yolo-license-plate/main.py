@@ -7,7 +7,7 @@ from fastapi import FastAPI, File, APIRouter
 from fastapi.responses import FileResponse, Response, StreamingResponse
 from PIL import Image
 from fastapi.middleware.cors import CORSMiddleware
-from ONNXModel.processing import processing
+from ONNXModel.processing import processing, processing_one_object
 from yolo_function.yoloV7.processing import YOLOV7Processing
 # from yolo_function.yoloV5.processing import YOLOV5Processing
 
@@ -58,13 +58,25 @@ async def detect_image(file:bytes = File()):
 
 @router.post('/images/predict')
 async def detect_image(file:bytes = File()):
-    # test = YOLOV7Processing()
     image_base64 = np.fromstring(base64.b64decode(file), dtype=np.uint8)
     image_base64 = cv2.imdecode(image_base64, cv2.IMREAD_ANYCOLOR)
-    # labels = processing(image_base64)
     labels = processing(image_base64)
-    # labels = test.predict(image)
     return labels
+
+@router.post('/images/predict/one-object')
+async def detect_image(file:bytes = File()):
+    image_base64 = np.fromstring(base64.b64decode(file), dtype=np.uint8)
+    image_base64 = cv2.imdecode(image_base64, cv2.IMREAD_ANYCOLOR)
+    labels = processing_one_object(image_base64)
+    return labels
+
+@router.post('/images/predict/one-object/test')
+async def detect_image(file:bytes = File()):
+    img = Image.open(io.BytesIO(file))
+    image = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
+    labels = processing_one_object(image)
+    return labels
+
 
 app.include_router(router)
 
