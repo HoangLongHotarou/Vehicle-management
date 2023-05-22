@@ -8,6 +8,10 @@ from pydantic import EmailStr, Field,AnyUrl
 from utils.pyobjectid import ObjectId, PyObjectId
 from api.models.entrance_auth import EntranceAuthModel
 
+class CheckExistFaceSchema(BaseModel):
+    username: str
+    id_region: str
+
 class CheckExistFace(BaseModel):
     username: Optional[str]
     id_region: Optional[PyObjectId]

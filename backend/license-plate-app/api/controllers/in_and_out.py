@@ -405,7 +405,8 @@ class InAndOutController(metaclass=SingletonMeta):
             not_register.append(
                 {
                     'plate': plate,
-                    'information': 'vehicle not yet registered'
+                    'information': 'vehicle not yet registered',
+                    'coordinate':coordinate
                 }
             )
             return self.return_data(register, not_register, warning, turn)
@@ -469,7 +470,8 @@ class InAndOutController(metaclass=SingletonMeta):
         return self.return_data(register, not_register, warning, turn)
     
     async def add_username_to_exist_face(self,username, id_region):
-        data = await self.checkExistFaceCrud.get(query={'username':username, 'id_region':id_region})
+        data = await self.checkExistFaceCrud.get(query={'username':username,'id_region':PyObjectId(id_region)})
+        print(data)
         if data == None:
             data = await self.checkExistFaceCrud.add(
                 CheckExistFace(username=username,id_region=id_region, created_at= datetime.utcnow()).dict()
@@ -477,7 +479,7 @@ class InAndOutController(metaclass=SingletonMeta):
         return data
     
     async def is_exist_face(self,username, id_region):
-        data = await self.checkExistFaceCrud.get(query={'username':username, 'id_region': id_region})
+        data = await self.checkExistFaceCrud.get(query={'username':username, 'id_region': PyObjectId(id_region)})
         return True if data else False
     
     def calculate_reduce_date(self,date_split):

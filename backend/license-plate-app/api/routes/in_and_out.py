@@ -4,7 +4,7 @@ from enum import Enum
 from typing import Union
 
 from api.models.in_and_out import (InAndOutModelListOutV2, Search, SelectType)
-from api.models.check_exist_face import CheckExistFace
+from api.models.check_exist_face import CheckExistFace, CheckExistFaceSchema
 from fastapi import (APIRouter, BackgroundTasks, File, Form, Query,
                      UploadFile, WebSocket, Request)
 from api.models.vehicle import VehicleType
@@ -72,9 +72,10 @@ async def check_turn_in_out_realtime(
 
 @router.post('/mark_face')
 async def mark_face(
-    check: CheckExistFace
+    check: CheckExistFaceSchema
 ):
-    data = await inAndOutCtrl
+    data = await inAndOutCtrl.add_username_to_exist_face(check.username, check.id_region)
+    return {"detail": "marked"}
 
 # @router.post('/check_turn_in_out_realtime')
 # async def check_turn_in_out_realtime(

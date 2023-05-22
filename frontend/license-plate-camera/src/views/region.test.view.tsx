@@ -68,8 +68,7 @@ export default function RegionTestView() {
       {!cameras ? (<>not camera</>) : (cameras.map((camera, i) => (
         <div key={i}>
           <Board name={camera.name} type={camera.type} />
-          <img src={camera.face_rtsp_url} width="40%" />
-          <ShowCamera url={camera.rtsp_url} data={plate} type={camera['type']} />
+          <ShowCamera face_url={camera.face_rtsp_url} url={camera.rtsp_url} data={plate} type={camera['type']} />
         </div>
       )))}
     </>

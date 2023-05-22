@@ -273,19 +273,17 @@ class FaceCameraStream(BaseCamera):
         if self.faces == [] or self.faces == None:
             return
         
-        # print(self.faces)
-        # data =object
+        face = self.faces[0]
+        
+        object = {
+            'username': face['username'],
+            'id_region': self.id_region
+        }
+        
         # data = asyncio.run(
-        #     self.fetchVehicleManager.check_turn_in_out(object)
+        #     self.fetchVehicleManager.mark_face(object)
         # )
         
-        # self.data_obj = object
-        # data = asyncio.run(
-        #     self.fetchVehicleManager.get_region(self.id_region)
-        # )
-        # if data != []:
-        #     asyncio.run(self.manager.broadcast(data,self.id_region))
-
     def frames(self)->any:
         frame = cv2.VideoCapture(0)
         count = 0
