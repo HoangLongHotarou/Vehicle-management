@@ -1,11 +1,37 @@
-.test{
+/* .test{
     display: flex;
+} */
+
+.camera-wrapper, .section {
+    padding: 0 20px;
 }
 
-.section{
+.section {
+    background-color: white;
+    margin: 0 20px;
+    border-radius: 2px;
+    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2); 
+}
+
+.camera-container {
+    flex: 1;
+}
+
+.camera-bx {
+    position: relative;
     width: 100%;
+    height: 350px;
 }
 
-.section2{
+.camera-bx img {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.section2 {
     height: 450px;
 }
