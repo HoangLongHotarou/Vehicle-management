@@ -62,10 +62,11 @@ async def check_turn_in_out_realtime(
     check: CheckInAndOutSchema
 ):
     # check.plate, check.id_region = "49E1-22222", '633eab6969d18929cf048b83'
+    check = check.dict()
     data = await inAndOutCtrl.check_vehicle_realtime_for_one_user(
-        plates_json=check.plates,
-        id_region=check.id_region, 
-        turn=check.turn
+        plates_json=check['plates'], 
+        id_region=check['id_region'], 
+        turn=check['turn']
     )
     return data
 

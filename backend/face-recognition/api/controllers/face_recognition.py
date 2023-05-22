@@ -67,16 +67,6 @@ class FaceRecognitionController(metaclass=SingletonMeta):
         cloud_uploader.destroy(f'{settings.STORE}/{public_id}')
         await self.infoCrud.delete(value=info.get('_id'))
 
-    # async def reload_model(self):
-    #     infos,_ = await self.videoFaceCrud.get_all()
-    #     names = []
-    #     embs =[]
-    #     for info in infos:
-    #         for emb in info['embs']:
-    #             embs.append(emb)
-    #             names.append(info['username'])
-    #     self.faceRecognition.reload_hnswlib(embs, names)
-
     async def get_information(self, objs):
         hash_usernames = [obj['hash_username'] for obj in objs]
         usernames, _ = await self.infoCrud.get_all(

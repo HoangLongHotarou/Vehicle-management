@@ -383,7 +383,7 @@ class InAndOutController(metaclass=SingletonMeta):
                 vehicle_information.append(object)
         return {"register":vehicle_information,"not_registered":unknown_plates,"turn":turn}
     
-    async def return_data(self, register, not_register, warning, turn):
+    def return_data(self, register, not_register, warning, turn):
         return {"register": register,"not_registered": not_register,"warning": warning,"turn": turn}
     
     async def check_vehicle_realtime_for_one_user(self,plates_json,id_region,turn):
@@ -397,7 +397,8 @@ class InAndOutController(metaclass=SingletonMeta):
         date = datetime.now(tz)
         if plates_json == []:
             return []
-        plate = plates_json[0].plate
+        plate = plates_json[0]['plate']
+        coordinate = plates_json[0]['coordinate']
 
         data = await self.vehicleCrud.filter_role_access_for_one_user(plate, id_region)
         if not data:
@@ -419,11 +420,14 @@ class InAndOutController(metaclass=SingletonMeta):
                 {
                     'plate': plate,
                     'type': data['type'],
-                    'owner': data['username'],
-                    'information': "Unauthorized driver detected"
+                    'owner': username,
+                    'information': "Unauthorized driver detected",
+                    'coordinate':coordinate
                 }
             )
-            return self.return_data(register, not_register, warning, turn)
+            test = self.return_data(register, not_register, warning, turn)
+            print(test)
+            return test
         
         role = await self.entranceAuthUserCrud.get_role_for_user(id_user=data['user_id'])
         
@@ -431,7 +435,7 @@ class InAndOutController(metaclass=SingletonMeta):
             warning.append({
                 'plate': plate,
                 'type': data['type'],
-                'username': data['username'],
+                'username': username,
                 'role': role,
                 'information': "Warning! Unauthorized vehicle approaching"
             })
@@ -455,7 +459,7 @@ class InAndOutController(metaclass=SingletonMeta):
             }
         register.append(
             { 
-                'username':ids_names.get(data['user_id'],'unknown'),
+                'username':username,
                 'plate':data['plate'],
                 'role': role,
                 'coordinate': dict_plates[data['plate']],

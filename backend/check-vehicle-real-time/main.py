@@ -2,7 +2,7 @@ import time
 
 from utils.pyobjectid import PyObjectId
 from utils.websocket import ConnectionManagerV2
-from utils.stream import CameraStream
+from utils.stream import VehicleCameraStream, FaceCameraStream
 from services.fetchapi import FetchVehicleManager
 
 import uvicorn
@@ -57,7 +57,9 @@ async def websocket_test(websocket: WebSocket):
             break
     test_manager.disconnect(websocket)
 
-stream = {}
+vehicle_stream = {}
+face_stream = {}
+
 def video_streaming_generator(camera_streaming):
     while True:
         frame = camera_streaming.get_frame()
@@ -65,13 +67,33 @@ def video_streaming_generator(camera_streaming):
         yield (b'--frame\r\n'
             b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
-@app.get('/api/v1/check-vehicle-real-time/camera')
-def video_feed(id_region: str,type: str,rtsp: str):
+
+@app.get('/api/v1/check-vehicle-real-time/vehicle/camera')
+def vehicle_video_feed(id_region: str,turn: str,rtsp: str):
     url = rtsp
-    if url not in stream.keys() or stream[url].thread==None:
-        stream[url] = CameraStream(id_region,type,url,test_manager)
+    if url not in vehicle_stream.keys() or vehicle_stream[url].thread==None:
+        vehicle_stream[url] = VehicleCameraStream(id_region,turn,url,test_manager)
+    vehicle_stream[url].set_turn(turn)
     return StreamingResponse(
-        video_streaming_generator(stream[url]),
+        video_streaming_generator(vehicle_stream[url]),
+        media_type='multipart/x-mixed-replace; boundary=frame'
+    )
+
+def face_video_streaming_generator(camera_streaming):
+    while True:
+        frame = camera_streaming.get_frame()
+        yield (b'--frame\r\n'
+            b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+
+
+@app.get('/api/v1/check-vehicle-real-time/face/camera')
+def face_video_feed(id_region: str, turn: str, rtsp: str):
+    url = rtsp
+    if url not in face_stream.keys() or face_stream[url].thread == None:
+        face_stream[url] = FaceCameraStream(id_region,turn,url)
+    face_stream[url].set_turn(turn)
+    return StreamingResponse(
+        face_video_streaming_generator(face_stream[url]),
         media_type='multipart/x-mixed-replace; boundary=frame'
     )
 
@@ -81,11 +103,17 @@ async def get_rtsp_from_region(request: Request,id_region: PyObjectId):
     cameras = region.get('cameras')
     if cameras == None: cameras=[]
     for i in range(len(cameras)):
-        urls= request.url_for(
-            'video_feed',
+        vehicle_urls= request.url_for(
+            'vehicle_video_feed',
         )
-        urls = urls+f"?id_region={id_region}&type={cameras[i]['type']}&rtsp={cameras[i]['rtsp_url']}"
-        cameras[i]['rtsp_url']=urls
+        face_urls= request.url_for(
+            'face_video_feed',
+        )
+        vehicle_urls = vehicle_urls+f"?id_region={id_region}&turn={cameras[i]['type']}&rtsp={cameras[i]['rtsp_url']}"
+        cameras[i]['rtsp_url']=vehicle_urls
+
+        face_urls = face_urls+f"?id_region={id_region}&turn={cameras[i]['type']}&rtsp={cameras[i]['rtsp_url']}"
+        cameras[i]['face_rtsp_url']=face_urls
     return cameras
 
 
