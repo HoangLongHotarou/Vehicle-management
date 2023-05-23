@@ -3,7 +3,8 @@ from core.config import settings
 
 async def connect_to_mongo():
     db.mongodb_client = AsyncIOMotorClient(
-        'mongodb://mongo1:27017/?replicaSet=rs0&directConnection=true'
+        # 'mongodb://mongo1:27017/?replicaSet=rs0&directConnection=true'
+        settings.DB_URL
     )
     db.mongodb = db.mongodb_client[settings.DB_NAME]
 
