@@ -27,21 +27,40 @@ export default function ShowCamera(props: ShowCameraProps) {
     return (
         <>
             <div className='test'>
-                <img src={url} width="40%" />
-                <img src={face_url} width="40%" />
+                <Box className="camera-wrapper"
+                    sx={{
+                        mb: 2,                        
+                        display: "flex",
+                        gap: 3,
+                    }}
+                >
+                    <div className="camera-container">
+                        <h4>Camera nhận diện biển số xe</h4>
+                        <div className='camera-bx'>
+                            <img src={url} />
+                        </div>
+                    </div>
+                    <div className="camera-container">
+                        <h4>Camera nhận diện khuôn mặt</h4>
+                        <div className='camera-bx'>
+                            <img src={face_url} />
+                        </div>
+                    </div>
+                </Box>
                 {/* <pre className="section section2">{JSON.stringify(info, null, ' ')}</pre> */}
                 <Box className="section"
                     sx={{
                         mb: 2,
                         display: "flex",
                         flexDirection: "column",
-                        height: 500,
-                        overflow: "hidden",
-                        overflowY: "scroll",
+                        // height: 500,
+                        // overflow: "hidden",
+                        // overflowY: "scroll",
                         // justifyContent="flex-end" # DO NOT USE THIS WITH 'scroll'
                     }}
                 >
-                    {info && info.register.map((register, i) => (
+                    <p>Lorem</p>
+                    {/* {info && info.register.map((register, i) => (
                         <>
                             <RegisterInfo data={register} />
                         </>
@@ -50,7 +69,7 @@ export default function ShowCamera(props: ShowCameraProps) {
                         <>
                             <NotRegisterInfo data={not_register} />
                         </>
-                    ))}
+                    ))} */}
                 </Box>
             </div>
         </>
