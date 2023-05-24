@@ -109,10 +109,10 @@ async def get_rtsp_from_region(request: Request,id_region: PyObjectId):
         face_urls= request.url_for(
             'face_video_feed',
         )
-        vehicle_urls = vehicle_urls+f"?id_region={id_region}&turn={cameras[i]['type']}&rtsp={cameras[i]['rtsp_url']}"
+        vehicle_urls = f"{vehicle_urls}?id_region={id_region}&turn={cameras[i]['type']}&rtsp={cameras[i]['rtsp_url']}"
         cameras[i]['rtsp_url']=vehicle_urls
 
-        face_urls = face_urls+f"?id_region={id_region}&turn={cameras[i]['type']}&rtsp={cameras[i]['rtsp_url']}"
+        face_urls = f"{face_urls}?id_region={id_region}&turn={cameras[i]['type']}&rtsp={cameras[i]['rtsp_url']}"
         cameras[i]['face_rtsp_url']=face_urls
     return cameras
 

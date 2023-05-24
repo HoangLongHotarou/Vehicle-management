@@ -129,9 +129,7 @@ class VehicleCameraStream(BaseCamera):
         )
         
         self.data_obj = data
-        # data = asyncio.run(
-        #     self.fetchVehicleManager.get_region(self.id_region)
-        # )
+
         if data != []:
             asyncio.run(self.manager.broadcast(data,self.id_region))
 
@@ -208,7 +206,7 @@ class VehicleCameraStream(BaseCamera):
                     cv2.rectangle(img, (int(x0), int(y0)), (int(x1), int(y1)), (0, 0, 255), 2)
                     image = cv2.putText(
                         img, 
-                        f"Warning: The owner: {re['owner']}", 
+                        f"Warning: The owner: {re['username']}", 
                         (int(x0)-10, int(y0)-10), 
                         cv2.FONT_HERSHEY_SIMPLEX, 
                         1, 
@@ -280,9 +278,9 @@ class FaceCameraStream(BaseCamera):
             'id_region': self.id_region
         }
         
-        # data = asyncio.run(
-        #     self.fetchVehicleManager.mark_face(object)
-        # )
+        data = asyncio.run(
+            self.fetchVehicleManager.mark_face(object)
+        )
         
     def frames(self)->any:
         frame = cv2.VideoCapture(0)
