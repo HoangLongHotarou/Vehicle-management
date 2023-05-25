@@ -67,7 +67,7 @@ export default function RegionView() {
       {!cameras?(<>not camera</>):(cameras.map((camera,i)=>(
         <div key={i}>
           <Board name={camera.name} type={camera.type}/>
-          <ShowCamera url={camera['rtsp_url']} data={plate} type={camera['type']} />
+          <ShowCamera face_url='' url={camera['rtsp_url']} data={plate} type={camera['type']} />
         </div>
       )))}
     </>

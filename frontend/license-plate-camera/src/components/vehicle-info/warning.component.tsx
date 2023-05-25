@@ -1,17 +1,19 @@
+import { useEffect, useState } from "react";
+import { LicensePlate } from "../../interfaces/license-plate";
 import { Card, CardContent, Typography } from "@mui/material";
-import { ShowRegisterInfo } from "../../interfaces/show-information-camera";
+import { ShowWarningInfo } from "../../interfaces/show-information-camera";
 
-interface RegisterInfoProps{
-    data: ShowRegisterInfo
+interface WarningInfoProps{
+    data: ShowWarningInfo
 }
 
-export default function RegisterInfo(props: RegisterInfoProps){
+export default function WarningInfo(props: WarningInfoProps){
     var {data} = props;
 
     return(
         <>
             <Card sx={{ minWidth: 275 }}>
-                <CardContent>
+            <CardContent>
                     <Typography sx={{ mb: 1.5, color: "#7d9bca"}}  gutterBottom>
                     Username: {data.username}
                     </Typography>
@@ -29,13 +31,7 @@ export default function RegisterInfo(props: RegisterInfoProps){
                     ))}
                     </Typography>
                     <Typography sx={{ mb: 1.5, color: "#7d9bca" }} >                    
-                    Message: {data.information.message}
-                    </Typography>
-                    <Typography sx={{ mb: 1.5, color: "#7d9bca" }} >                    
-                    Date: {data.information.date}
-                    </Typography>
-                    <Typography sx={{ mb: 1.5, color: "#7d9bca" }} >                    
-                    Time: {data.information.time}
+                    Warning: {data.information}
                     </Typography>
                 </CardContent>
             </Card>

@@ -1,39 +1,39 @@
 version: '3.8'
 
 services:
-  mongo1:
-    hostname: mongo1
-    image: mongo
-    ports:
-      - 27017:27017
-    restart: always
-    command: mongod --replSet rs0
-  mongo2:
-    hostname: mongo2
-    image: mongo
-    restart: always
-    command: mongod --replSet rs0
-  mongo3:
-    hostname: mongo3
-    image: mongo
-    restart: always
-    command: mongod --replSet rs0
-  mongoinit:
-    image: mongo
-    command: >
-      mongosh --host mongo1:27017 --eval  '
-        rs.initiate( {
-        _id : "rs0",
-        members: [
-            { _id: 0, host: "mongo1:27017" },
-            { _id: 1, host: "mongo2:27017" },
-            { _id: 2, host: "mongo3:27017" }
-        ]
-      })' 
-    depends_on:
-      - mongo1
-      - mongo2
-      - mongo3
+  # mongo1:
+  #   hostname: mongo1
+  #   image: mongo
+  #   ports:
+  #     - 27017:27017
+  #   restart: always
+  #   command: mongod --replSet rs0
+  # mongo2:
+  #   hostname: mongo2
+  #   image: mongo
+  #   restart: always
+  #   command: mongod --replSet rs0
+  # mongo3:
+  #   hostname: mongo3
+  #   image: mongo
+  #   restart: always
+  #   command: mongod --replSet rs0
+  # mongoinit:
+  #   image: mongo
+  #   command: >
+  #     mongosh --host mongo1:27017 --eval  '
+  #       rs.initiate( {
+  #       _id : "rs0",
+  #       members: [
+  #           { _id: 0, host: "mongo1:27017" },
+  #           { _id: 1, host: "mongo2:27017" },
+  #           { _id: 2, host: "mongo3:27017" }
+  #       ]
+  #     })' 
+  #   depends_on:
+  #     - mongo1
+  #     - mongo2
+  #     - mongo3
 
   auth_service:
     build:
@@ -64,6 +64,7 @@ services:
     image: hotaroudazai/license-plate-app
     volumes:
       - ./backend/license-plate-app:/license-plate-app
+    restart: always
     env_file:
       - ./env/license-plate-app.env
     ports:
@@ -71,15 +72,15 @@ services:
     depends_on:
       - auth_service
       - ai_service
-  check_vehicle_service:
-    build:
-      context: .
-      dockerfile: dockerfiles/check-vehicle-real-time.dockerfile
-    image: hotaroudazai/check-vehicle-real-time
-    volumes:
-      - ./backend/check-vehicle-real-time:/check-vehicle-real-time
-    ports:
-      - '8004:8000'
+  # check_vehicle_service:
+  #   build:
+  #     context: .
+  #     dockerfile: dockerfiles/check-vehicle-real-time.dockerfile
+  #   image: hotaroudazai/check-vehicle-real-time
+  #   volumes:
+  #     - ./backend/check-vehicle-real-time:/check-vehicle-real-time
+  #   ports:
+  #     - '8004:8000'
   face_recognition_service:
     build:
       context: .
@@ -111,21 +112,21 @@ services:
   #     dockerfile: dockerfiles/frontend.dockerfile
   #   volumes:
   #     - react_build:/react/build
-  nginx:
-    build:
-      context: .
-      dockerfile: dockerfiles/nginx.dockerfile
-    image: hotaroudazai/nginx-license-plate
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
-      - react_build:/var/www/react
-    ports:
-      - '80:80'
-      - '443:80'
-    depends_on:
-      - auth_service
-      - app_service
-      - ai_service
+  # nginx:
+  #   build:
+  #     context: .
+  #     dockerfile: dockerfiles/nginx.dockerfile
+  #   image: hotaroudazai/nginx-license-plate
+  #   volumes:
+  #     - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+  #     - react_build:/var/www/react
+  #   ports:
+  #     - '80:80'
+  #     - '443:80'
+  #   depends_on:
+  #     - auth_service
+  #     - app_service
+  #     - ai_service
       # - frontend
       # - check_vehicle_service
   worker:
@@ -136,6 +137,6 @@ services:
     volumes:
       - ./backend/face-recognition:/face-recognition
     depends_on:
-      - nginx
+      - face_recognition_service
 volumes:
   react_build:

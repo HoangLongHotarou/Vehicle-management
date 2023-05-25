@@ -7,7 +7,10 @@ class YOLOv7(BaseYOLO):
     
     def predict(self,img):
         image = img.copy()
-        image, ratio, dwdh = letterbox(image, auto=False)
+        try:
+            image, ratio, dwdh = letterbox(image, auto=False)
+        except:
+            return None
         image = image.transpose((2,0,1))
         image = np.expand_dims(image,0)
         image = np.ascontiguousarray(image)
@@ -31,11 +34,12 @@ class YOLOv7(BaseYOLO):
 class YOLOv7Detect(YOLOv7):
     def __init__(self, cuda=False) -> None:
         w = 'onnx_folder/DetectV7/detect_best.onnx'
+        # w = 'onnx_folder/DetectV7/best.onnx'
         super().__init__(w,cuda)
 
 
 class YOLOv7Recognize(YOLOv7):
     def __init__(self, cuda=False) -> None:
-        w = 'onnx_folder/RecognizeV7/best.onnx'
-        # w = 'onnx_folder/RecognizeV7/recognize_best.onnx'
+        # w = 'onnx_folder/RecognizeV7/best.onnx'
+        w = 'onnx_folder/RecognizeV7/recognize_best.onnx'
         super().__init__(w,cuda)

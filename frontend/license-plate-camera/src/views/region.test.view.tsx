@@ -17,13 +17,15 @@ export default function RegionTestView() {
   const fetchRegion = new FetchRegion();
   const fetchInAndOut = new FetchInAndOut();
 
-  var [regions, setRegions] = useState<Region[]>([]);
-  var [cameras, setCameras] = useState<RTSPCamera[]>([]);
-  var [value, setValue] = useState<string>('');
-  var [plate, setplate] = useState<LicensePlate>();
+  let [regions, setRegions] = useState<Region[]>([]);
+  let [cameras, setCameras] = useState<RTSPCamera[]>([]);
+  let [value, setValue] = useState<string>('');
+  let [plate, setplate] = useState<LicensePlate>();
+  let [turn, setTurn] = useState<string>('in');
+  
 
   useEffect(() => {
-    // BaseWebSocketAPI.Instance.receiveDataUseState(setplate);
+    BaseWebSocketAPI.Instance.receiveDataUseState(setplate);
     // BaseWebSocketAPI.Instance.receiveData();
   }, [])
 
@@ -39,11 +41,17 @@ export default function RegionTestView() {
     // BaseWebSocketAPI.Instance.sendData({
     //   status: event.target.value
     // })
-    console.log(event.target.value)
     setValue(event.target.value)
+    BaseWebSocketAPI.Instance.sendData({
+      status: event.target.value
+    })
     fetchInAndOut.get_rtsp(event.target.value).then((res) => {
       setCameras([res[0]]);
     })
+  }
+
+  const handleChangeTurn = (event: any) => {
+    setTurn(event.target.value)    
   }
 
   return (
@@ -64,11 +72,26 @@ export default function RegionTestView() {
           ))}
         </Select>
       </FormControl>
+      <FormControl fullWidth>
+        <Select
+          labelId="demo-simple-select-label"
+          id="demo-simple-select"
+          label="Turn"
+          onChange={handleChangeTurn}
+        >
+            <MenuItem value={'in'}>
+              turn in
+            </MenuItem>
+            <MenuItem value={'out'}>
+              turn out
+            </MenuItem>
+        </Select>
+      </FormControl>
       {/* <pre className="section">{JSON.stringify(cameras, null, ' ')}</pre> */}
       {!cameras ? (<>not camera</>) : (cameras.map((camera, i) => (
         <div key={i}>
           <Board name={camera.name} type={camera.type} />
-          <ShowCamera face_url={camera.face_rtsp_url} url={camera.rtsp_url} data={plate} type={camera['type']} />
+          <ShowCamera face_url={camera.face_rtsp_url} url={camera.rtsp_url} data={plate} type={turn} />
         </div>
       )))}
     </>

@@ -438,9 +438,7 @@ class VehicleCrud(BaseCrud):
         pipeline=[
             {
                 '$match':{
-                    'plate':{
-                        "$in":plate
-                    }
+                    'plate':plate
                 }
             },
             {

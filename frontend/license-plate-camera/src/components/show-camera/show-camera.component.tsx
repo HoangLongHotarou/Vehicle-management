@@ -5,24 +5,44 @@ import { ShowUserInfo } from "../../interfaces/show-information-camera";
 import RegisterInfo from "../vehicle-info/register.components";
 import NotRegisterInfo from "../vehicle-info/not-register.component";
 import { Box } from "@mui/material";
+import { parse } from "path";
+import WarningInfo from "../vehicle-info/warning.component";
 
 interface ShowCameraProps {
     url: string;
-    face_url?: string;
+    face_url: string;
     data?: ShowUserInfo;
     type: string;
 }
 
 export default function ShowCamera(props: ShowCameraProps) {
-    var { url, face_url, data, type } = props;
+    let { url, face_url, data, type } = props;
 
-    var [info, setInfo] = useState<ShowUserInfo>();
+    let [info, setInfo] = useState<ShowUserInfo>();
+    let [faceUrl, setFaceUrl] = useState<string>();
+    let [vehicleUrl, setVehicleUrl] = useState<string>();
 
     useEffect(() => {
-        if (data && type === data.turn) {
-            setInfo(data)
-        }
-    }, [data])
+        // if (data && type === data.turn) {
+        //     setInfo(data)
+        // }
+        setInfo(data);
+        console.log(info);
+    })
+
+    const changeTurn = (url: string, turn: string): string=>{
+        const parseUrl = new URL(url);
+        const searchParams = parseUrl.searchParams;
+        searchParams.set("turn",turn);
+        const updateQueryString = searchParams.toString();
+        const updateUrl = `${parseUrl.origin}${parseUrl.pathname}?${updateQueryString}`
+        return updateUrl;
+    }
+
+    useEffect(()=>{
+        setFaceUrl(changeTurn(face_url, type));
+        setVehicleUrl(changeTurn(url,type));
+    })
 
     return (
         <>
@@ -37,13 +57,13 @@ export default function ShowCamera(props: ShowCameraProps) {
                     <div className="camera-container">
                         <h4>Camera nhận diện biển số xe</h4>
                         <div className='camera-bx'>
-                            <img src={url} />
+                            <img src={vehicleUrl} />
                         </div>
                     </div>
                     <div className="camera-container">
                         <h4>Camera nhận diện khuôn mặt</h4>
                         <div className='camera-bx'>
-                            <img src={face_url} />
+                            <img src={faceUrl} />
                         </div>
                     </div>
                 </Box>
@@ -59,8 +79,8 @@ export default function ShowCamera(props: ShowCameraProps) {
                         // justifyContent="flex-end" # DO NOT USE THIS WITH 'scroll'
                     }}
                 >
-                    <p>Lorem</p>
-                    {/* {info && info.register.map((register, i) => (
+                    {/* <p>Lorem</p> */}
+                    {info && info.register.map((register, i) => (
                         <>
                             <RegisterInfo data={register} />
                         </>
@@ -69,7 +89,14 @@ export default function ShowCamera(props: ShowCameraProps) {
                         <>
                             <NotRegisterInfo data={not_register} />
                         </>
-                    ))} */}
+                    ))}
+                    {
+                        info && info.warning.map((warning,i)=>(
+                            <>
+                                <WarningInfo data={warning}/>
+                            </>
+                        ))
+                    }
                 </Box>
             </div>
         </>

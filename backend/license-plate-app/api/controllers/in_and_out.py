@@ -100,7 +100,7 @@ class InAndOutController(metaclass=SingletonMeta):
             'time':str(date.time()),
             'type':turn
         }
-        
+        print(time)
         add_in_and_out = None
         in_and_out_time_id = None
         in_and_out_id = None
@@ -125,7 +125,7 @@ class InAndOutController(metaclass=SingletonMeta):
                         'time': in_and_out_time['times'][-1]['time']
                     }
                 return False, vehicle_has_been_turn
-            elif in_and_out_time['date'] == date:
+            elif in_and_out_time['date'] == str(date.date()):
                 in_and_out_time_id = in_and_out_time['_id']
                 await self.inAndOutTimeCrud.push_times_one_user(in_and_out_time_id,time)
             else:
@@ -232,26 +232,6 @@ class InAndOutController(metaclass=SingletonMeta):
             } 
             vehicle_information.append(object)
         return vehicle_information
-
-    async def check_vehicle_v2(self,plates_json,id_region,turn):
-        date = datetime.now(tz)
-        if plates_json == []: 
-            return []
-        plates =[plate['plate'] for plate in plates_json] 
-        data_list,ids_user = await self.vehicleCrud.filter_detail_vehicle_v2(plates,id_region,str(date.date()))
-        # data_list,ids_user = await self.vehicleCrud.filter_detail_vehicle(plates,id_region,str(date.date()))
-        
-        print(data_list)
-        return "ehehe"
-    
-    async def check_vehicle_v3(self,id_region):
-        date = datetime.now(tz)
-        # if plates_json == []: 
-            # return []
-        # plates =[plate['plate'] for plate in plates_json]
-        plates = ['49E1-22222','59M1-81859','54Y8-8280'] 
-        data_list = await self.vehicleCrud.filter_role_access(plates,id_region)
-        return "ehehe"
 
     async def check_vehicle_realtime(self,plate_json,id_region,turn):
         date = datetime.now(tz)
@@ -395,12 +375,15 @@ class InAndOutController(metaclass=SingletonMeta):
         warning = []
 
         date = datetime.now(tz)
+        # date = datetime.now()
+        print(date.time())
         if plates_json == []:
             return []
         plate = plates_json[0]['plate']
         coordinate = plates_json[0]['coordinate']
 
         data = await self.vehicleCrud.filter_role_access_for_one_user(plate, id_region)
+    
         if not data:
             not_register.append(
                 {
@@ -411,26 +394,29 @@ class InAndOutController(metaclass=SingletonMeta):
             )
             return self.return_data(register, not_register, warning, turn)
         
+        role = await self.entranceAuthUserCrud.get_role_for_user(id_user=data['user_id'])
+        if role:
+            role = [r['entrance_auth']['name'] for r in role]
+        
         user = await self.fetchAuth.get_user(data['user_id'])
         username = user['username']
         
         check = await self.is_exist_face(username, id_region)
         
-        if not check:
+        if check == False:
             warning.append(
                 {
                     'plate': plate,
                     'type': data['type'],
-                    'owner': username,
+                    'username': username,
+                    'role': role,
                     'information': "Unauthorized driver detected",
                     'coordinate':coordinate
                 }
             )
             test = self.return_data(register, not_register, warning, turn)
-            print(test)
             return test
         
-        role = await self.entranceAuthUserCrud.get_role_for_user(id_user=data['user_id'])
         
         if not data['entrance_auth_user']:
             warning.append({
@@ -438,12 +424,14 @@ class InAndOutController(metaclass=SingletonMeta):
                 'type': data['type'],
                 'username': username,
                 'role': role,
-                'information': "Warning! Unauthorized vehicle approaching"
+                'information': "Warning! Unauthorized vehicle approaching",
+                'coordinate':coordinate
             })
             return self.return_data(register, not_register, warning, turn)
 
+        # data_vehicle = await self.vehicleCrud.filter_detail_vehicle_v2_for_one_user(plate,id_region,str(date.date()))
         data_vehicle = await self.vehicleCrud.filter_detail_vehicle_v2_for_one_user(plate,id_region,str(date.date()))
-
+        
         check, vehicle_has_been_turn = await self._mark_in_and_out_for_one_user(turn, data_vehicle, id_region, date)
         
         if not vehicle_has_been_turn:
@@ -463,7 +451,7 @@ class InAndOutController(metaclass=SingletonMeta):
                 'username':username,
                 'plate':data['plate'],
                 'role': role,
-                'coordinate': dict_plates[data['plate']],
+                'coordinate': coordinate,
                 'information': info,
             } 
         )
@@ -471,7 +459,6 @@ class InAndOutController(metaclass=SingletonMeta):
     
     async def add_username_to_exist_face(self,username, id_region):
         data = await self.checkExistFaceCrud.get(query={'username':username,'id_region':PyObjectId(id_region)})
-        print(data)
         if data == None:
             data = await self.checkExistFaceCrud.add(
                 CheckExistFace(username=username,id_region=id_region, created_at= datetime.utcnow()).dict()

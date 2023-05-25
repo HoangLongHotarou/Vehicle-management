@@ -7,7 +7,7 @@ export interface info{
 export interface ShowRegisterInfo{
     username: string;
     plate: string;
-    role:string[];
+    role: string[];
     information: info;
 }
 
@@ -16,8 +16,17 @@ export interface ShowNotRegisterInfo{
     information: string;
 }
 
+export interface ShowWarningInfo{
+    plate: string,
+    type:  string,
+    username: string,
+    role: string[],
+    information: string,
+}
+
 export interface ShowUserInfo{
     register: ShowRegisterInfo[]
     not_registered: ShowNotRegisterInfo[]
+    warning: ShowWarningInfo[]
     turn: string;
 }

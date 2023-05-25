@@ -13,7 +13,7 @@ export default function App() {
                 }}
             >
                 <Link to="/setting">Setting</Link>
-                <Link to="/region">Region</Link>
+                <Link to="/region-test">Region</Link>
             </nav>
         </div>
     )
