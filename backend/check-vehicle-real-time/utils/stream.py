@@ -122,6 +122,7 @@ class VehicleCameraStream(BaseCamera):
             'plates': self.plates,
             'id_region': str(self.id_region),
             'turn': self.turn,
+            'image': image
         }
         # data =object
         data = asyncio.run(
@@ -275,7 +276,8 @@ class FaceCameraStream(BaseCamera):
         
         object = {
             'username': face['username'],
-            'id_region': self.id_region
+            'id_region': self.id_region,
+            'image': image
         }
         
         data = asyncio.run(
