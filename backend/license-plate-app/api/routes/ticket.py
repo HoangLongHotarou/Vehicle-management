@@ -16,7 +16,7 @@ async def add_vehicle_for_current_user(
     ticket_schema: TicketUserSchema,
     current_user=Depends(get_current_user)
 ):
-    await ticketCtrl.add_ticked(ticket_schema.ticket_type,ticket_schema.vehicle_type, current_user['id'])
+    await ticketCtrl.add_ticket(ticket_schema.ticket_type,ticket_schema.vehicle_type, current_user['id'])
     return "test"
 
 
