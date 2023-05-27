@@ -111,7 +111,7 @@ class VehicleCameraStream(BaseCamera):
     def useAI(self,img):
         _, im_arr = cv2.imencode('.jpg', img)
         im_bytes = im_arr.tobytes()
-        image = base64.b64encode(im_bytes)
+        image = base64.b64encode(im_bytes).decode('utf-8')
         
         self.plates = asyncio.run(self.fetchYoloAPI.predict(image))
         
@@ -122,6 +122,7 @@ class VehicleCameraStream(BaseCamera):
             'plates': self.plates,
             'id_region': str(self.id_region),
             'turn': self.turn,
+            'image_base64': image
         }
         # data =object
         data = asyncio.run(
@@ -203,7 +204,7 @@ class VehicleCameraStream(BaseCamera):
                     y0 = re['coordinate']['y0']
                     x1 = re['coordinate']['x1']
                     y1 = re['coordinate']['y1']
-                    cv2.rectangle(img, (int(x0), int(y0)), (int(x1), int(y1)), (0, 0, 255), 2)
+                    cv2.rectangle(img, (int(x0), int(y0)), (int(x1), int(y1)), (0, 255, 0), 2)
                     image = cv2.putText(
                         img, 
                         f"Warning: The owner: {re['username']}", 
@@ -262,7 +263,7 @@ class FaceCameraStream(BaseCamera):
     def useAI(self,img):
         _, im_arr = cv2.imencode('.jpg', img)
         im_bytes = im_arr.tobytes()
-        image = base64.b64encode(im_bytes)
+        image = base64.b64encode(im_bytes).decode('utf-8')
         
         data = asyncio.run(self.fetchRecognitionAPI.predict(image))
         
@@ -275,7 +276,8 @@ class FaceCameraStream(BaseCamera):
         
         object = {
             'username': face['username'],
-            'id_region': self.id_region
+            'id_region': self.id_region,
+            'image_base64': image
         }
         
         data = asyncio.run(
@@ -308,9 +310,9 @@ class FaceCameraStream(BaseCamera):
                     
                     username = face['username']
                     
-                    color = (0, 0, 255)
+                    color = (255, 0, 0)
                     if face['distance'] == -1:
-                        color = (255, 0, 0)
+                        color = (0, 0, 255)
                     
                     cv2.rectangle(img, (int(x0), int(y0)), (int(x1), int(y1)), color, 2)
                     image = cv2.putText(
@@ -319,7 +321,7 @@ class FaceCameraStream(BaseCamera):
                         (int(x0)-10, int(y0)-10), 
                         cv2.FONT_HERSHEY_SIMPLEX, 
                         1, 
-                        (255, 0, 0), 
+                        color, 
                         2, 
                         cv2.LINE_AA
                     )
