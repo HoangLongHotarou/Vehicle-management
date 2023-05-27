@@ -12,7 +12,6 @@ router = APIRouter(
 
 @router.post('/me')
 async def add_vehicle_for_current_user(
-    
     ticket_schema: TicketUserSchema,
     current_user=Depends(get_current_user)
 ):
