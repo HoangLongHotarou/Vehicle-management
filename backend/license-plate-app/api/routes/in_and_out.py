@@ -3,8 +3,8 @@ import base64
 from enum import Enum
 from typing import Union
 
-from api.models.in_and_out import (InAndOutModelListOutV2, Search, SelectType)
-from fastapi import (APIRouter, BackgroundTasks, File, Form, Query,
+from api.models.in_and_out import (InAndOutModelListOutV2, Search, SelectType,GetInOutForUser)
+from fastapi import (APIRouter, BackgroundTasks, File, Form, Query, Depends,
                      UploadFile, WebSocket, Request)
 from api.models.vehicle import VehicleType
 
@@ -14,6 +14,7 @@ from utils.pyobjectid import PyObjectId
 from api.schemas.check_in_and_out import CheckInAndOutSchema
 
 from api.controllers.in_and_out import InAndOutController
+from core.jwt import get_current_user
 
 
 router = APIRouter(prefix='/in_and_out',tags=['In and out'],responses={'404':{'description': 'Not found'}})
@@ -79,6 +80,20 @@ async def get_all_in_and_out_time(
     data = await inAndOutCtrl.get_aggregate(sort,page,limit,search)
     return data
 
+@router.post('/get_detail_in_and_out_for_user',response_model=InAndOutModelListOutV2)
+async def get_all_in_and_out_time(
+    order: Union[SortDates,None]=None,
+    search: Union[GetInOutForUser,None]=None,
+    page: int = Query(0, ge=0),
+    limit: int = Query(20, ge=0, le=50),
+    current_user=Depends(get_current_user)
+):
+    inAndOutCtrl = InAndOutController()
+    sort = None
+    if order is not None:
+        sort = 1 if order == SortDates.ascending else -1
+    data = await inAndOutCtrl.get_aggregate_user(sort,page,limit,search,current_user['id'])
+    return data
 
 @router.get('/statistic_in_and_out')
 async def statistic_in_and_out(date: str):

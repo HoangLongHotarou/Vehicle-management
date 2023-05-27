@@ -27,6 +27,9 @@ class InAndOutController(metaclass=SingletonMeta):
     
     async def get_aggregate(self,sort,skip,limit,search):
         return await self.inAndOutCrud.filter_detail_in_and_out_time(sort,skip,limit,search)
+    
+    async def get_aggregate_user(self,sort,skip,limit,search,id_user):
+        return await self.inAndOutCrud.get_detail_in_and_out_for_user(sort,skip,limit,search, id_user)
 
     async def _preprocessing_data(self,turn,data_list,id_region):
         add_in_and_out = []

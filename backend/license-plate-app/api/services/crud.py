@@ -105,6 +105,163 @@ class InAndOutCrud(BaseCrud):
         ids = await self.add_many(data)
         return ids
     
+    async def get_detail_in_and_out_for_user(self,sort,skip,limit,search, id_user):
+        technique = [ 
+            {
+                "$skip": (skip-1)*limit if skip > 0 else 0
+            },
+            {
+                '$limit': limit
+            }
+        ]
+        if sort != None:
+            technique.append(
+                {
+                    '$sort': {"in_and_out_time.date": sort}
+                },
+            )
+        pipeline = [
+            {
+                '$lookup':
+                {
+                    'from': 'license_plate_vehicle',
+                    'localField':'id_vehicle',
+                    'foreignField':'_id',
+                    'as':'vehicle'
+                },
+            },{
+                '$unwind':'$vehicle'
+            },
+            {
+                '$lookup':
+                {
+                    'from': 'license_plate_region',
+                    'localField':'id_region',
+                    'foreignField':'_id',
+                    'as':'region'
+                },
+            },
+            {
+                '$unwind':'$region'
+            },
+            {
+                '$lookup':
+                {
+                    'from': 'license_plate_in_and_out_time',
+                    'localField':'_id',
+                    'foreignField':'id_in_and_out',
+                    'pipeline': [
+                        { '$project': {'id_in_and_out': 0 }}
+                    ],
+                    'as':'in_and_out_time'
+                },
+            },
+            {
+                '$unwind': '$in_and_out_time'
+            }
+        ]
+        if id_user != None:
+            pipeline.append(
+                {
+                    '$match':{
+                        'vehicle.user_id': PyObjectId(id_user)
+                    }
+                }
+            )
+        if search != None:
+            if search.date!=None:
+                pipeline.append(
+                    {
+                        '$match': {
+                            'in_and_out_time.date':{
+                                '$gte':search.date.start_date,'$lte':search.date.end_date
+                            }
+                        }
+                    }
+                )
+            if search.region_id != None:
+                pipeline.append(
+                    {
+                        '$match': {
+                            'region._id': search.region_id
+                        }
+                    }
+                )
+            if search.plate != None:
+                pipeline.append(
+                    {
+                        '$match':{
+                            'vehicle.plate':search.plate
+                        }
+                    }
+                )
+        pipeline.append(
+            { '$facet': 
+                {
+                    'metadata': [
+                        {   
+                            '$group': { 
+                                '_id': 'null',
+                                'total': { '$sum': 1 },
+                                'total_in_and_out':{
+                                    '$sum':{
+                                        '$size':"$in_and_out_time.times"
+                                    }
+                                },
+                                'total_in':{
+                                    '$sum':{
+                                        '$size':{
+                                                '$filter':{
+                                                'input':"$in_and_out_time.times",
+                                                'cond':{'$eq':['$$this.type','in']}
+                                            }
+                                        }
+                                    }
+                                },
+                                'total_out':{
+                                    '$sum':{
+                                        '$size':{
+                                            '$filter':{
+                                                'input':"$in_and_out_time.times",
+                                                'cond':{'$eq':['$$this.type','out']}
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                        },{
+                            '$addFields':{'pages_size':0,'page':skip,'limit':limit}
+                        }
+                    ],
+                    'list': technique
+                }
+            }
+        )
+        pipeline.append({
+        '$project': { 
+            'list': 1,
+            'total': { '$arrayElemAt': [ '$metadata.total', 0 ] },
+            'pages_size': { '$arrayElemAt': [ '$metadata.pages_size', 0 ] },
+            'page': { '$arrayElemAt': [ '$metadata.page', 0 ] },
+            'limit': { '$arrayElemAt': [ '$metadata.limit', 0 ] },
+            'total_in_and_out':{'$arrayElemAt': [ '$metadata.total_in_and_out', 0 ]},
+            'total_in':{'$arrayElemAt': [ '$metadata.total_in', 0 ]},
+            'total_out':{'$arrayElemAt': [ '$metadata.total_out', 0 ]}
+            }
+        })
+        result = self.db.mongodb[self.model].aggregate(
+            pipeline
+        )
+        list = []
+        async for data in result:
+            # print(data)
+            if data['list']==[]:
+                list=data
+            else:
+                data['pages_size'] = math.ceil(data['total']/limit) if limit > 0 else 0
+                list=data
+        return list
+    
     async def filter_detail_in_and_out_time(self,sort,skip,limit,search):
         technique = [ 
             {
