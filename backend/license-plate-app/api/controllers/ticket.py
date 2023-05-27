@@ -35,14 +35,15 @@ class TicketController(metaclass=SingletonMeta):
             price = price*30*12
             expire_date += timedelta(days=30*12)
     
-        if ticked == None:
+        if ticket == None:
             await self.tickedCrud.add(TicketModel(
                 user_id=user_id,
                 vehicle_type=vehicle_type,
                 register_date=[
                     RegisterDate(
-                        created_at=created_date,
-                        expire_at=expire_date,
+                        register_type=ticket_type,
+                        created_at=str(created_date),
+                        expire_at=str(expire_date),
                         price=price
                     ).dict()
                 ]

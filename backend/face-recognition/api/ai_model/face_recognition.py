@@ -105,6 +105,7 @@ class FaceRecognition():
 
     def predict(self, image):
         results = []
+        image = cv2.resize(image, (360, 360))
         self.p = hnswlib.Index(space='l2', dim=512)
         self.p.load_index(
             'data_file/embedding.bin',

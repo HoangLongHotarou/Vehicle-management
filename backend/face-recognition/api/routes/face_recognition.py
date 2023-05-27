@@ -44,6 +44,7 @@ async def train(
     info = await faceRecognitionCtrl.get_face(username)
     option = None if train_option == None else train_option.value
     if info == None or option != None:
+        info['_id'] = str(info['_id'])
         video_bytes = await file.read()
         task_train.delay(
             video_bytes.hex(), 

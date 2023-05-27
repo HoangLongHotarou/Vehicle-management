@@ -57,6 +57,8 @@ services:
     restart: always
     ports:
       - '8002:8000'
+    depends_on:
+      - auth_service
   app_service:
     build:
       context: .
@@ -81,6 +83,10 @@ services:
   #     - ./backend/check-vehicle-real-time:/check-vehicle-real-time
   #   ports:
   #     - '8004:8000'
+  redis:
+    image: redis:alpine3.16
+    ports:
+      - '6379:6379'
   face_recognition_service:
     build:
       context: .
@@ -93,19 +99,8 @@ services:
       - ./env/face-recognition.env
     ports:
       - '8005:8000'
-  # check_face_service:
-  #   build:
-  #     context: .
-  #     dockerfile: dockerfiles/check-face-real-time.dockerfile
-  #   image: hotaroudazai/check-face-real-time
-  #   volumes:
-  #     - ./backend/check-face-real-time:/check-face-real-time
-  #   ports:
-  #     - '8006:8000'
-  redis:
-    image: redis:alpine3.16
-    ports:
-      - '6379:6379'
+    depends_on:
+      - redis
   # frontend:
   #   build:
   #     context: .

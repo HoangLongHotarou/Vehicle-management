@@ -49,7 +49,7 @@ class FaceRecognitionController(metaclass=SingletonMeta):
         embs = self.faceRecognition.train(url)
         self.faceRecognition.continue_train(embs, hash_username)
         await self.infoCrud.update(
-            value=id_info,
+            value=PyObjectId(id_info),
             config_data={'len_embs': len(embs)}
         )
 
@@ -82,6 +82,7 @@ class FaceRecognitionController(metaclass=SingletonMeta):
         result = []
         for i, obj in enumerate(objs):
             obj.pop('hash_username')
+            print(usernames)
             obj['username'] = usernames[i]['username']
             result.append(obj)
         return result
