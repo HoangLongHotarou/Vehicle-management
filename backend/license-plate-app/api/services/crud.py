@@ -1031,3 +1031,8 @@ class CheckExistFaceCrud(BaseCrud):
     async def add(self, data, session=None):
         await self.create_expire()
         return await super().add(data, session=session)
+
+
+class TicketCrud(BaseCrud):
+    def __init__(self):
+        super().__init__(f'{app}_ticker')

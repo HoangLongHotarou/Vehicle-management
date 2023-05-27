@@ -1,5 +1,6 @@
 import asyncio
 from datetime import datetime
+from pytz import timezone
 
 from api.models.in_and_out import InAndOutModel
 from api.models.in_and_out_time import InAndOutTimeModel
@@ -8,7 +9,6 @@ from api.services.crud import (InAndOutCrud, InAndOutTimeCrud, RegionCrud,Vehicl
                             CheckExistFaceCrud, EntranceAuthUserCrud)
 from api.services.fetchapi import FetchAuthAPI, FetchYoloAPI
 from pymongo import IndexModel
-from pytz import timezone
 from utils.singleton import SingletonMeta
 from utils.pyobjectid import PyObjectId
 

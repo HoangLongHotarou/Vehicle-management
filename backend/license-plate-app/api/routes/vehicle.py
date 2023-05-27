@@ -19,7 +19,7 @@ router = APIRouter(
 
 
 @router.get('/', response_model=VehicleModelListOut)
-# @check_has_permissions
+@check_has_permission
 async def get_all_vehicle(
     page: int = Query(0, ge=0),
     limit: int = Query(20, ge=0, le=20),
