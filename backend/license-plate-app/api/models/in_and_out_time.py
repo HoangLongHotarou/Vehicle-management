@@ -14,6 +14,8 @@ class Type(str,Enum):
 class Time(BaseModel):
     time: Optional[str]
     type: Optional[Type]
+    vehicle_img_base64: Optional[str]
+    face_img_base64: Optional[str]
 
 class InAndOutTimeModel(BaseModel):
     id_in_and_out: Optional[PyObjectId]

@@ -3,9 +3,9 @@ import base64
 from enum import Enum
 from typing import Union
 
-from api.models.in_and_out import (InAndOutModelListOutV2, Search, SelectType)
+from api.models.in_and_out import (InAndOutModelListOutV2, Search, SelectType, GetInOutForUser)
 from api.models.check_exist_face import CheckExistFace, CheckExistFaceSchema
-from fastapi import (APIRouter, BackgroundTasks, File, Form, Query,
+from fastapi import (APIRouter, BackgroundTasks, File, Form, Query,Depends,
                      UploadFile, WebSocket, Request)
 from api.models.vehicle import VehicleType
 
@@ -15,6 +15,8 @@ from utils.pyobjectid import PyObjectId
 from api.schemas.check_in_and_out import CheckInAndOutSchema
 
 from api.controllers.controller import *
+from core.jwt import get_current_user
+
 
 
 router = APIRouter(prefix='/in_and_out',tags=['In and out'],responses={'404':{'description': 'Not found'}})
@@ -66,7 +68,8 @@ async def check_turn_in_out_realtime(
     data = await inAndOutCtrl.check_vehicle_realtime_for_one_user(
         plates_json=check['plates'], 
         id_region=check['id_region'], 
-        turn=check['turn']
+        turn=check['turn'],
+        vehicle_img_base64=check['image_base64']
     )
     return data
 
@@ -74,7 +77,11 @@ async def check_turn_in_out_realtime(
 async def mark_face(
     check: CheckExistFaceSchema
 ):
-    data = await inAndOutCtrl.add_username_to_exist_face(check.username, check.id_region)
+    data = await inAndOutCtrl.add_username_to_exist_face(
+        check.username, 
+        check.id_region, 
+        check.image_base64
+        )
     return {"detail": "marked"}
 
 # @router.post('/check_turn_in_out_realtime')
@@ -108,6 +115,20 @@ async def get_all_in_and_out_time(
     if order is not None:
         sort = 1 if order == SortDates.ascending else -1
     data = await inAndOutCtrl.get_aggregate(sort,page,limit,search)
+    return data
+
+@router.post('/get_detail_in_and_out_for_user',response_model=InAndOutModelListOutV2)
+async def get_all_in_and_out_time(
+    order: Union[SortDates,None]=None,
+    search: Union[GetInOutForUser,None]=None,
+    page: int = Query(0, ge=0),
+    limit: int = Query(20, ge=0, le=50),
+    current_user=Depends(get_current_user)
+):
+    sort = None
+    if order is not None:
+        sort = 1 if order == SortDates.ascending else -1
+    data = await inAndOutCtrl.get_aggregate_user(sort,page,limit,search,current_user['id'])
     return data
 
 

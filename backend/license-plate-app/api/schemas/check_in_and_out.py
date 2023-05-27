@@ -22,6 +22,7 @@ class CheckInAndOutSchema(BaseModel):
     plates: Optional[List[PlateSchema]]
     id_region: Optional[PyObjectId]
     turn: Optional[Type]
+    image_base64: Optional[str]
 
 # class CheckInAndOutSchema(BaseModel):
 #     plate: Optional[str]

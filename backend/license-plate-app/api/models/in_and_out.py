@@ -66,3 +66,8 @@ class Search(BaseModel):
     time_out: Optional[Time]
     region: Optional[SearchRegionModel]
     vehicle: Optional[SearchVehicle]
+
+class GetInOutForUser(BaseModel):
+    date: Optional[Date]
+    region_id: Optional[PyObjectId]
+    plate: Optional[str]
