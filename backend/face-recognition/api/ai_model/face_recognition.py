@@ -170,4 +170,12 @@ class FaceRecognition():
                         'coordinate': bbox
                     }
                 )
+            else:
+                results.append(
+                    {
+                        'hash_username': None,
+                        'distance': -1,
+                        'coordinate': bbox
+                    }
+                )
         return results
