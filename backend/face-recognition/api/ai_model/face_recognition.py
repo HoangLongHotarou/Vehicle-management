@@ -140,7 +140,6 @@ class FaceRecognition():
 
     def predict_one_user(self, image):
         results = []
-        resize_image = cv2.resize(image, (360, 360))
         self.p = hnswlib.Index(space='l2', dim=512)
         self.p.load_index(
             'data_file/embedding.bin',
@@ -155,12 +154,12 @@ class FaceRecognition():
             
             box = boxes[0]
             bbox = list(map(int, box.tolist()))
-            scale_x = image.shape[1] / img.shape[1]
-            scale_y = image.shape[0] / img.shape[0]
-            bbox[0] = int(bbox[0] * scale_x)
-            bbox[1] = int(bbox[1] * scale_y)
-            bbox[2] = int(bbox[2] * scale_x)
-            bbox[3] = int(bbox[3] * scale_y)
+            # scale_x = image.shape[1] / img.shape[1]
+            # scale_y = image.shape[0] / img.shape[0]
+            # bbox[0] = int(bbox[0] * scale_x)
+            # bbox[1] = int(bbox[1] * scale_y)
+            # bbox[2] = int(bbox[2] * scale_x)
+            # bbox[3] = int(bbox[3] * scale_y)
             
             img_region = img[bbox[1]:bbox[3], bbox[0]:bbox[2]]
             im_pil = Image.fromarray(img_region)

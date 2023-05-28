@@ -39,7 +39,7 @@ const FaceRegister = () => {
     const handleSubmit = async () => {
         setLoading(true);
         const formData = new FormData();
-        if (mediaBlobUrl === undefined || username === null) return
+        if (mediaBlobUrl === undefined || username === null || username === '') return
         const mediaBlob = await fetch(mediaBlobUrl).then(response => response.blob());
         const myFile = new File(
             [mediaBlob],
