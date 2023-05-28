@@ -188,3 +188,4 @@ class FaceRecognition():
                     }
                 )
         return results
+
