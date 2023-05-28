@@ -31,6 +31,9 @@ class InAndOutController(metaclass=SingletonMeta):
     
     async def get_aggregate(self,sort,skip,limit,search):
         return await self.inAndOutCrud.filter_detail_in_and_out_time(sort,skip,limit,search)
+    
+    async def get_aggregate_user(self,sort,skip,limit,search,id_user):
+        return await self.inAndOutCrud.get_detail_in_and_out_for_user(sort,skip,limit,search, id_user)
 
     async def _preprocessing_data(self,turn,data_list,id_region):
         add_in_and_out = []
@@ -95,12 +98,14 @@ class InAndOutController(metaclass=SingletonMeta):
                     ids.append(PyObjectId(in_and_out['_id']))
         return ids,add_in_and_out,in_and_out_time_ids,vehicle_has_been_turn
     
-    async def _mark_in_and_out_for_one_user(self,turn,data,id_region,date):
+    async def _mark_in_and_out_for_one_user(self,turn,data,id_region,date, vehicle_img_base64, face_img_base64):
         time = {
             'time':str(date.time()),
-            'type':turn
+            'type':turn,
+            'vehicle_img_base64': vehicle_img_base64,
+            'face_img_base64': face_img_base64
         }
-        print(time)
+        # print(time)
         add_in_and_out = None
         in_and_out_time_id = None
         in_and_out_id = None
@@ -366,7 +371,7 @@ class InAndOutController(metaclass=SingletonMeta):
     def return_data(self, register, not_register, warning, turn):
         return {"register": register,"not_registered": not_register,"warning": warning,"turn": turn}
     
-    async def check_vehicle_realtime_for_one_user(self,plates_json,id_region,turn):
+    async def check_vehicle_realtime_for_one_user(self,plates_json,id_region,turn, vehicle_img_base64):
         vehicle_information = []
         role_plates = {}
         # unknown_plates = []
@@ -401,9 +406,9 @@ class InAndOutController(metaclass=SingletonMeta):
         user = await self.fetchAuth.get_user(data['user_id'])
         username = user['username']
         
-        check = await self.is_exist_face(username, id_region)
+        face_img_base64 = await self.get_face_image(username, id_region)
         
-        if check == False:
+        if face_img_base64 is None:
             warning.append(
                 {
                     'plate': plate,
@@ -432,7 +437,7 @@ class InAndOutController(metaclass=SingletonMeta):
         # data_vehicle = await self.vehicleCrud.filter_detail_vehicle_v2_for_one_user(plate,id_region,str(date.date()))
         data_vehicle = await self.vehicleCrud.filter_detail_vehicle_v2_for_one_user(plate,id_region,str(date.date()))
         
-        check, vehicle_has_been_turn = await self._mark_in_and_out_for_one_user(turn, data_vehicle, id_region, date)
+        check, vehicle_has_been_turn = await self._mark_in_and_out_for_one_user(turn, data_vehicle, id_region, date, vehicle_img_base64, face_img_base64)
         
         if not vehicle_has_been_turn:
             info = {
@@ -457,17 +462,25 @@ class InAndOutController(metaclass=SingletonMeta):
         )
         return self.return_data(register, not_register, warning, turn)
     
-    async def add_username_to_exist_face(self,username, id_region):
+    async def add_username_to_exist_face(self,username, id_region, image_base64):
         data = await self.checkExistFaceCrud.get(query={'username':username,'id_region':PyObjectId(id_region)})
         if data == None:
             data = await self.checkExistFaceCrud.add(
-                CheckExistFace(username=username,id_region=id_region, created_at= datetime.utcnow()).dict()
+                CheckExistFace(
+                    username=username,
+                    id_region=id_region,
+                    created_at= datetime.utcnow(),
+                    image_base64=image_base64
+                ).dict()
             )
         return data
     
-    async def is_exist_face(self,username, id_region):
+    async def get_face_image(self,username, id_region):
         data = await self.checkExistFaceCrud.get(query={'username':username, 'id_region': PyObjectId(id_region)})
-        return True if data else False
+        # return True if data else False
+        if data:
+            return data['image_base64']
+        return None
     
     def calculate_reduce_date(self,date_split):
         date_split[2] -= 1

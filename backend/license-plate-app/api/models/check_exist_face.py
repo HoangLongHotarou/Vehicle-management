@@ -11,8 +11,10 @@ from api.models.entrance_auth import EntranceAuthModel
 class CheckExistFaceSchema(BaseModel):
     username: str
     id_region: str
+    image_base64: str
 
 class CheckExistFace(BaseModel):
     username: Optional[str]
     id_region: Optional[PyObjectId]
     created_at: Optional[datetime]
+    image_base64: Optional[str]
