@@ -7,6 +7,7 @@ import RegionView from './views/region.view';
 import TestView from './views/test.view';
 import Setting from './views/setting.view';
 import RegionTestView from './views/region.test.view';
+import FaceRegister from './views/face-register.view';
 
 export default function WebRouters() {
     useEffect(() => {
@@ -24,6 +25,7 @@ export default function WebRouters() {
                 <Route path='region' element={<RegionView />} />
                 <Route path='region-test' element={<RegionTestView />} />
                 <Route path='test' element={<TestView />} />
+                <Route path='face-register' element={<FaceRegister/>}/>
             </Routes>
         </BrowserRouter>
     )

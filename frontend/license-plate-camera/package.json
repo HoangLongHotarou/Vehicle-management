@@ -5,6 +5,8 @@
   "dependencies": {
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
+    "@mui/icons-material": "^5.11.16",
+    "@mui/lab": "^5.0.0-alpha.131",
     "@mui/material": "^5.10.12",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
@@ -17,6 +19,7 @@
     "mini.css": "^3.0.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-media-recorder": "^1.6.6",
     "react-router-dom": "^6.4.3",
     "react-scripts": "5.0.1",
     "typescript": "^4.8.4",

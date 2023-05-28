@@ -26,4 +26,12 @@ export class BaseFetchAPI {
             }
         })
     }
+
+    async postFormData(urls: string, formData: FormData) {
+        return axios.post(`${this.resourceUrl + urls}`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            }
+        })
+    }
 }
