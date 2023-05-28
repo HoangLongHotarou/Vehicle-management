@@ -68,7 +68,7 @@ const FaceRegister = () => {
             case statusText.stop:
                 return 'Đã ghi hình thành công!';
             default:
-                return 'Vui lòng nhấn nút ghi hình để lưu video nhận dạng khuôn mặt.';
+                return 'Vui lòng nhấn nút ghi hình để tạo video nhận dạng khuôn mặt.';
         }
     }
 
