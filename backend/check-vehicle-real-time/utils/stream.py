@@ -307,14 +307,19 @@ class FaceCameraStream(BaseCamera):
                     y1 = face['coordinate'][3]
                     
                     username = face['username']
-                    cv2.rectangle(img, (int(x0), int(y0)), (int(x1), int(y1)), (255, 0, 0), 2)
+                    
+                    color = (255, 0, 0)
+                    if face['distance'] == -1:
+                        color = (0, 0, 255)
+                    
+                    cv2.rectangle(img, (int(x0), int(y0)), (int(x1), int(y1)), color, 2)
                     image = cv2.putText(
                         img, 
                         f'{username} - {self.turn}', 
                         (int(x0)-10, int(y0)-10), 
                         cv2.FONT_HERSHEY_SIMPLEX, 
                         1, 
-                        (255, 0, 0), 
+                        color, 
                         2, 
                         cv2.LINE_AA
                     )

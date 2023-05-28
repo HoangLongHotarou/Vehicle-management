@@ -68,22 +68,26 @@ class FaceRecognitionController(metaclass=SingletonMeta):
         await self.infoCrud.delete(value=info.get('_id'))
 
     async def get_information(self, objs):
-        hash_usernames = [obj['hash_username'] for obj in objs]
-        usernames, _ = await self.infoCrud.get_all(
+        hash_usernames = [obj['hash_username'] for obj in objs if objs]
+        users, _ = await self.infoCrud.get_all(
             query={
                 'hash_username': {
                     '$in': hash_usernames
                 }
             },
             projection={
-                'username': 1
+                'username': 1,
+                'hash_username':1
             }
         )
+        hash_user_dict = {user['hash_username']:user['username'] for user in users}
         result = []
         for i, obj in enumerate(objs):
-            obj.pop('hash_username')
-            print(usernames)
-            obj['username'] = usernames[i]['username']
+            hash_username = obj.pop('hash_username')
+            if hash_username:
+                obj['username'] = hash_user_dict[hash_username]
+            else:
+                obj['username'] = 'unknown'
             result.append(obj)
         return result
 
