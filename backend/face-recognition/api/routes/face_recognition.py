@@ -44,14 +44,19 @@ async def train(
     info = await faceRecognitionCtrl.get_face(username)
     option = None if train_option == None else train_option.value
     if info == None or option != None:
-        info['_id'] = str(info['_id'])
+        if info:
+            info['_id'] = str(info['_id'])
         video_bytes = await file.read()
+        
+        print(video_bytes)
+        
         task_train.delay(
             video_bytes.hex(), 
             username, 
             option, 
             info
         )
+        
         return JSONResponse(
             status_code=status.HTTP_202_ACCEPTED,
             content={

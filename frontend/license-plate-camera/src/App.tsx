@@ -14,6 +14,7 @@ export default function App() {
             >
                 <Link to="/setting">Setting</Link>
                 <Link to="/region-test">Region</Link>
+                <Link to="/face-register">Face Register</Link>
             </nav>
         </div>
     )
