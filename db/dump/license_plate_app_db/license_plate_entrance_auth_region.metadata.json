@@ -1,0 +1,1 @@
+{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"},{"v":{"$numberInt":"2"},"key":{"id_entrance_auth":{"$numberInt":"1"},"id_region":{"$numberInt":"1"}},"name":"id_entrance_auth_1_id_region_1","unique":true}],"uuid":"67f87a6ec03a4fa5bca789aca1157cdf","collectionName":"license_plate_entrance_auth_region","type":"collection"}

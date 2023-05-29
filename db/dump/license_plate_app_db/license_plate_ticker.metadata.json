@@ -1,0 +1,1 @@
+{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"}],"uuid":"5a2eaa6c23e8473586d738823325af93","collectionName":"license_plate_ticker","type":"collection"}

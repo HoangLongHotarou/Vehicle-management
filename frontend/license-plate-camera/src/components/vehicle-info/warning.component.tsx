@@ -14,23 +14,23 @@ export default function WarningInfo(props: WarningInfoProps){
         <>
             <Card sx={{ minWidth: 275 }}>
             <CardContent>
-                    <Typography sx={{ mb: 1.5, color: "#7d9bca"}}  gutterBottom>
+                    <Typography sx={{ mb: 1.5, color: "#FF6314"}}  gutterBottom>
                     Username: {data.username}
                     </Typography>
-                    <Typography sx={{ mb: 1.5, color: "#7d9bca" }} >                    
+                    <Typography sx={{ mb: 1.5, color: "#FF6314" }} >                    
                     Plate: {data.plate}
                     </Typography>
-                    <Typography sx={{ mb: 1.5, color: "#7d9bca" }} >                    
+                    <Typography sx={{ mb: 1.5, color: "#FF6314" }} >                    
                     Roles:
                     {data.role.map((role,i)=>(
                         <>
-                                <Typography key={i} sx={{ mb: 1.5, color: "#7d9bca" }} >
+                                <Typography key={i} sx={{ mb: 1.5, color: "#FF6314" }} >
                                 - {role}                             
                                 </Typography>
                         </> 
                     ))}
                     </Typography>
-                    <Typography sx={{ mb: 1.5, color: "#7d9bca" }} >                    
+                    <Typography sx={{ mb: 1.5, color: "#FF6314" }} >                    
                     Warning: {data.information}
                     </Typography>
                 </CardContent>

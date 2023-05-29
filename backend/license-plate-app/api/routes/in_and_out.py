@@ -63,6 +63,9 @@ async def check_turn_in_out(
 async def check_turn_in_out_realtime(
     check: CheckInAndOutSchema
 ):
+    '''
+    kiểm tra turn in out biển số xe trong thời gian thực
+    '''
     # check.plate, check.id_region = "49E1-22222", '633eab6969d18929cf048b83'
     check = check.dict()
     data = await inAndOutCtrl.check_vehicle_realtime_for_one_user(
@@ -77,6 +80,9 @@ async def check_turn_in_out_realtime(
 async def mark_face(
     check: CheckExistFaceSchema
 ):
+    '''
+    Đánh dấu mặt trong mongodb (có thời gian lưu 120 giây, sau đó tự động xóa)
+    '''
     data = await inAndOutCtrl.add_username_to_exist_face(
         check.username, 
         check.id_region, 
@@ -95,11 +101,6 @@ async def mark_face(
 #         turn=check['turn'])
 #     return data
 
-@router.get('/test')
-async def test():
-    # await inAndOutCtrl.check_vehicle_v3(PyObjectId('633eab6969d18929cf048b83'))
-    await inAndOutCtrl.check_vehicle_v3(PyObjectId('633eab8169d18929cf048b85'))
-
 class SortDates(str, Enum):
     ascending = 'date'
     descending = '-date'
@@ -111,6 +112,9 @@ async def get_all_in_and_out_time(
     page: int = Query(0, ge=0),
     limit: int = Query(20, ge=0, le=50),
 ):
+    '''
+    tìm kiếm số lượng xe ra vào theo search
+    '''
     sort = None
     if order is not None:
         sort = 1 if order == SortDates.ascending else -1
@@ -125,6 +129,9 @@ async def get_all_in_and_out_time(
     limit: int = Query(20, ge=0, le=50),
     current_user=Depends(get_current_user)
 ):
+    '''
+    Lấy thông tin ra vào của user đó theo thời gian cho trước
+    '''
     sort = None
     if order is not None:
         sort = 1 if order == SortDates.ascending else -1
@@ -134,4 +141,7 @@ async def get_all_in_and_out_time(
 
 @router.get('/statistic_in_and_out')
 async def statistic_in_and_out(date: str):
+    '''
+    Thống kê số lượng xe ra vào
+    '''
     return await inAndOutCtrl.statistic_in_and_out(date)

@@ -1,0 +1,1 @@
+{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"}],"uuid":"1030a183369446df919e3348677e9a8c","collectionName":"license_plate_entrance_auth","type":"collection"}

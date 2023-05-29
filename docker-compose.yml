@@ -101,27 +101,22 @@ services:
       - '8005:8000'
     depends_on:
       - redis
-  # frontend:
-  #   build:
-  #     context: .
-  #     dockerfile: dockerfiles/frontend.dockerfile
-  #   volumes:
-  #     - react_build:/react/build
-  # nginx:
-  #   build:
-  #     context: .
-  #     dockerfile: dockerfiles/nginx.dockerfile
-  #   image: hotaroudazai/nginx-license-plate
-  #   volumes:
-  #     - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
-  #     - react_build:/var/www/react
-  #   ports:
-  #     - '80:80'
-  #     - '443:80'
-  #   depends_on:
-  #     - auth_service
-  #     - app_service
-  #     - ai_service
+  nginx:
+    build:
+      context: .
+      dockerfile: dockerfiles/nginx.dockerfile
+    image: hotaroudazai/nginx-license-plate
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - react_build:/var/www/react
+    ports:
+      - '80:80'
+      - '443:80'
+    depends_on:
+      - auth_service
+      - app_service
+      - ai_service
+      - face_recognition_service
       # - frontend
       # - check_vehicle_service
   worker:
