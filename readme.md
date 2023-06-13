@@ -4,7 +4,7 @@ A Vehicle Management System that analyze and record the vehicles using ANPR (Aut
 ### Microservice:
 ![img](demo/Microservice.png)
 Backend folder:
-- Managing and authenticating for user
+- User management and authentication:
 ```
 ├───auth
 │   ├───api
@@ -20,13 +20,13 @@ Backend folder:
 │       └───templates
 ```
 
-- detecting and recognizing license-place and recognizing face real-time
+- Real-time license plate detection/recognition and face-recognition:
 ```
 ├───check-vehicle-real-time
 │   ├───services
 │   └───utils
 ```
-- Face recognition use FaceNet, MTCNN and HNSWlib 
+- Face recognition using FaceNet, MTCNN and HNSWlib 
 ```
 ├───face-recognition
 │   ├───api
@@ -59,7 +59,7 @@ Backend folder:
 │   ├───db
 │   └───utils
 ```
-- License-plate detection and recognition use YOLO
+- License plate detection and recognition using YOLO:
 ```
 └───yolo-license-plate
     ├───base
@@ -85,6 +85,13 @@ Backend folder:
 ### Requirement:
 Python version >= 3.9
 Node module >= v18.16.0
+
+### Demo:
+1. Swagger: [Demo Video Link](https://www.youtube.com/watch?v=Rwx2PFWrNaw)
+![img](demo/swagger.png)
+
+2. Realtime License Plate Recognition: [Demo Video Link](https://www.youtube.com/watch?v=C4vqtv3u_jI)
+![img](demo/realtime.png)
 
 ### Technologies:
  - Microservice: NGINX, FastAPI, Mongodb, YOLO, Docker, MTCNN, FaceNet, HNSWlib.
