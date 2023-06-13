@@ -405,8 +405,14 @@ class InAndOutController(metaclass=SingletonMeta):
         
         user = await self.fetchAuth.get_user(data['user_id'])
         username = user['username']
+        fullname = f"{user['last_name']} {user['first_name']}"
         
-        face_img_base64 = await self.get_face_image(username, id_region)
+        if user['first_name'] == None:
+            put_text = username
+        else:
+            put_text = user['first_name']
+        
+        face_img_base64, face_id = await self.get_face_image(username, id_region)
         
         if face_img_base64 is None:
             warning.append(
@@ -415,7 +421,10 @@ class InAndOutController(metaclass=SingletonMeta):
                     'type': data['type'],
                     'username': username,
                     'role': role,
-                    'information': "Unauthorized driver detected",
+                    'fullname': fullname,
+                    'put_text':put_text,
+                    # 'information': "Unauthorized driver detected",
+                    'information': "Người trên xe không phải chủ xe",
                     'coordinate':coordinate
                 }
             )
@@ -428,8 +437,11 @@ class InAndOutController(metaclass=SingletonMeta):
                 'plate': plate,
                 'type': data['type'],
                 'username': username,
+                'fullname': fullname,
+                'put_text':put_text,
                 'role': role,
-                'information': "Warning! Unauthorized vehicle approaching",
+                # 'information': "Warning! Unauthorized vehicle approaching",
+                'information': "Cảnh báo! xe lạ vào cổng",
                 'coordinate':coordinate
             })
             return self.return_data(register, not_register, warning, turn)
@@ -439,21 +451,27 @@ class InAndOutController(metaclass=SingletonMeta):
         
         check, vehicle_has_been_turn = await self._mark_in_and_out_for_one_user(turn, data_vehicle, id_region, date, vehicle_img_base64, face_img_base64)
         
+        # await self.delete_face(face_id)
+        
+        vn_turn = "vào" if turn == 'in' else "ra"
+        
         if not vehicle_has_been_turn:
             info = {
-                'message': f'turn {turn}',
+                'message': f'xe {vn_turn} cổng',
                 'date': str(date.date()),
                 'time': str(date.time())
             }
         else:
             info = {
-                'message': f"already {turn}",
+                'message': f"xe đã {vn_turn} cổng",
                 'date': vehicle_has_been_turn['date'],
                 'time': vehicle_has_been_turn['time']
             }
         register.append(
             { 
                 'username':username,
+                'fullname': fullname,
+                'put_text':put_text,
                 'plate':data['plate'],
                 'role': role,
                 'coordinate': coordinate,
@@ -479,8 +497,11 @@ class InAndOutController(metaclass=SingletonMeta):
         data = await self.checkExistFaceCrud.get(query={'username':username, 'id_region': PyObjectId(id_region)})
         # return True if data else False
         if data:
-            return data['image_base64']
-        return None
+            return data['image_base64'], data['_id']
+        return None, None
+    
+    async def delete_face(self,id):
+        await self.checkExistFaceCrud.delete(value=PyObjectId(id))
     
     def calculate_reduce_date(self,date_split):
         date_split[2] -= 1

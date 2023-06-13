@@ -10,16 +10,19 @@ export default function RegisterInfo(props: RegisterInfoProps){
 
     return(
         <>
-            <Card sx={{ minWidth: 275 }}>
-                <CardContent>
+            <Card sx={{ minWidth: 275, display: "flex", justifyContent: "space-between" }}>
+                <CardContent sx={{ textAlign: "left"}}>
                     <Typography sx={{ mb: 1.5, color: "#7d9bca"}}  gutterBottom>
                     Username: {data.username}
                     </Typography>
-                    <Typography sx={{ mb: 1.5, color: "#7d9bca" }} >                    
-                    Plate: {data.plate}
+                    <Typography sx={{ mb: 1.5, color: "#7d9bca"}}  gutterBottom>
+                    Họ và tên: {data.fullname}
                     </Typography>
                     <Typography sx={{ mb: 1.5, color: "#7d9bca" }} >                    
-                    Roles:
+                    Biển số: {data.plate}
+                    </Typography>
+                    <Typography sx={{ mb: 1.5, color: "#7d9bca" }} >                    
+                    Vai trò:
                     {data.role.map((role,i)=>(
                         <>
                                 <Typography key={i} sx={{ mb: 1.5, color: "#7d9bca" }} >
@@ -29,13 +32,18 @@ export default function RegisterInfo(props: RegisterInfoProps){
                     ))}
                     </Typography>
                     <Typography sx={{ mb: 1.5, color: "#7d9bca" }} >                    
-                    Message: {data.information.message}
+                    Thông tin: {data.information.message}
                     </Typography>
                     <Typography sx={{ mb: 1.5, color: "#7d9bca" }} >                    
-                    Date: {data.information.date}
+                    Ngày: {data.information.date}
                     </Typography>
                     <Typography sx={{ mb: 1.5, color: "#7d9bca" }} >                    
-                    Time: {data.information.time}
+                    Thời gian: {data.information.time}
+                    </Typography>
+                </CardContent>
+                <CardContent sx={{ display: "flex", justifyContent: "center" }}>
+                    <Typography sx={{ display: "flex", justifyContent: "center", alignItems: "center", border: "1px solid blue", color: "#7d9bca"  }} >                    
+                    <h1>{data.information.message}</h1> 
                     </Typography>
                 </CardContent>
             </Card>

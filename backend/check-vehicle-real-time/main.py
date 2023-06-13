@@ -63,7 +63,7 @@ face_stream = {}
 def video_streaming_generator(camera_streaming):
     while True:
         frame = camera_streaming.get_frame()
-        time.sleep(0.25)
+        time.sleep(0.2)
         yield (b'--frame\r\n'
             b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
@@ -82,6 +82,7 @@ def vehicle_video_feed(id_region: str,turn: str,rtsp: str):
 def face_video_streaming_generator(camera_streaming):
     while True:
         frame = camera_streaming.get_frame()
+        time.sleep(0.2)
         yield (b'--frame\r\n'
             b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
@@ -112,7 +113,7 @@ async def get_rtsp_from_region(request: Request,id_region: PyObjectId):
         vehicle_urls = f"{vehicle_urls}?id_region={id_region}&turn={cameras[i]['type']}&rtsp={cameras[i]['rtsp_url']}"
         cameras[i]['rtsp_url']=vehicle_urls
 
-        face_urls = f"{face_urls}?id_region={id_region}&turn={cameras[i]['type']}&rtsp={cameras[i]['rtsp_url']}"
+        face_urls = f"{face_urls}?id_region={id_region}&turn={cameras[i]['type']}&rtsp={cameras[i]['face_rtsp_url']}"
         cameras[i]['face_rtsp_url']=face_urls
     return cameras
 

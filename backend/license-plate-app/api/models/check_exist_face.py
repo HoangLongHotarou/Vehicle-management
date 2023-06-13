@@ -15,6 +15,8 @@ class CheckExistFaceSchema(BaseModel):
 
 class CheckExistFace(BaseModel):
     username: Optional[str]
+    user_id: Optional[PyObjectId]
+    fullname: Optional[str]
     id_region: Optional[PyObjectId]
     created_at: Optional[datetime]
     image_base64: Optional[str]

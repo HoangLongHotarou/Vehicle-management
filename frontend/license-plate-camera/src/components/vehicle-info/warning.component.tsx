@@ -13,15 +13,18 @@ export default function WarningInfo(props: WarningInfoProps){
     return(
         <>
             <Card sx={{ minWidth: 275 }}>
-            <CardContent>
+                <CardContent>
                     <Typography sx={{ mb: 1.5, color: "#FF6314"}}  gutterBottom>
                     Username: {data.username}
                     </Typography>
-                    <Typography sx={{ mb: 1.5, color: "#FF6314" }} >                    
-                    Plate: {data.plate}
+                    <Typography sx={{ mb: 1.5, color: "#FF6314"}}  gutterBottom>
+                    Họ và tên: {data.fullname}
                     </Typography>
                     <Typography sx={{ mb: 1.5, color: "#FF6314" }} >                    
-                    Roles:
+                    Biển số: {data.plate}
+                    </Typography>
+                    <Typography sx={{ mb: 1.5, color: "#FF6314" }} >                    
+                    Vai trò:
                     {data.role.map((role,i)=>(
                         <>
                                 <Typography key={i} sx={{ mb: 1.5, color: "#FF6314" }} >
@@ -31,7 +34,7 @@ export default function WarningInfo(props: WarningInfoProps){
                     ))}
                     </Typography>
                     <Typography sx={{ mb: 1.5, color: "#FF6314" }} >                    
-                    Warning: {data.information}
+                    Cảnh báo: {data.information}
                     </Typography>
                 </CardContent>
             </Card>

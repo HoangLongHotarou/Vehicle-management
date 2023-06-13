@@ -6,6 +6,7 @@ export interface info{
 
 export interface ShowRegisterInfo{
     username: string;
+    fullname: string;
     plate: string;
     role: string[];
     information: info;
@@ -20,6 +21,7 @@ export interface ShowWarningInfo{
     plate: string,
     type:  string,
     username: string,
+    fullname: string,
     role: string[],
     information: string,
 }

@@ -44,7 +44,6 @@ services:
       - ./backend/auth:/auth
     env_file:
       - ./env/auth.env
-    restart: always
     ports:
       - '8001:8000'
   ai_service:
@@ -54,7 +53,6 @@ services:
     image: hotaroudazai/yolo-license-plate
     volumes:
       - ./backend/yolo-license-plate:/yolo-license-plate
-    restart: always
     ports:
       - '8002:8000'
     depends_on:
@@ -66,7 +64,6 @@ services:
     image: hotaroudazai/license-plate-app
     volumes:
       - ./backend/license-plate-app:/license-plate-app
-    restart: always
     env_file:
       - ./env/license-plate-app.env
     ports:
@@ -74,15 +71,15 @@ services:
     depends_on:
       - auth_service
       - ai_service
-  # check_vehicle_service:
-  #   build:
-  #     context: .
-  #     dockerfile: dockerfiles/check-vehicle-real-time.dockerfile
-  #   image: hotaroudazai/check-vehicle-real-time
-  #   volumes:
-  #     - ./backend/check-vehicle-real-time:/check-vehicle-real-time
-  #   ports:
-  #     - '8004:8000'
+  check_vehicle_service:
+    build:
+      context: .
+      dockerfile: dockerfiles/check-vehicle-real-time.dockerfile
+    image: hotaroudazai/check-vehicle-real-time
+    volumes:
+      - ./backend/check-vehicle-real-time:/check-vehicle-real-time
+    ports:
+      - '8004:8000'
   redis:
     image: redis:alpine3.16
     ports:
@@ -94,7 +91,6 @@ services:
     image: hotaroudazai/face-recognition
     volumes:
       - ./backend/face-recognition:/face-recognition
-    restart: always
     env_file:
       - ./env/face-recognition.env
     ports:
@@ -118,7 +114,7 @@ services:
       - ai_service
       - face_recognition_service
       # - frontend
-      # - check_vehicle_service
+      - check_vehicle_service
   worker:
     image: hotaroudazai/face-recognition
     command: celery -A api.tasks.worker worker --loglevel=INFO

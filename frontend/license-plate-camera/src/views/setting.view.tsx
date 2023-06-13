@@ -33,6 +33,7 @@ export default function Setting() {
         // console.log(event);
         const names = Array.from(document.getElementsByName('name'))
         const rtsp_links = Array.from(document.getElementsByName('rtsp_link'))
+        const face_rtsp_link = Array.from(document.getElementsByName('face_rtsp_link'))
         const types = Array.from(document.getElementsByName('type'))
         var camera_list = []
 
@@ -40,6 +41,7 @@ export default function Setting() {
             var object = {
                 name: (names[i] as HTMLInputElement).value,
                 rtsp_url: (rtsp_links[i] as HTMLInputElement).value,
+                face_rtsp_url: (face_rtsp_link[i] as HTMLInputElement).value,
                 type: (types[i] as HTMLInputElement).value
             }
             camera_list.push(object)
@@ -83,6 +85,7 @@ export default function Setting() {
                     <br/>
                     <TextField name="name" disabled label="Name" defaultValue={value.name}/>
                     <TextField name="rtsp_link" label="RTSP" defaultValue={value.rtsp_url} variant="filled"/>
+                    <TextField name="face_rtsp_link" label="RTSP" defaultValue={value.face_rtsp_url} variant="filled"/>
                     <TextField name="type" disabled label="type" defaultValue={value.type}/>
                     <br/>
                 </div>

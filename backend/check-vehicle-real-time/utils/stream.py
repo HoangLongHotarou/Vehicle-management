@@ -4,6 +4,7 @@ import concurrent.futures
 import threading
 import time
 from multiprocessing.pool import ThreadPool
+import unicodedata
 
 import cv2
 # from api.controllers.region import RegionController
@@ -167,6 +168,10 @@ class VehicleCameraStream(BaseCamera):
                     count1 = 0
                 
                 for re in register:
+                    username = re['put_text']
+                    normalized_string = unicodedata.normalize('NFD', username)
+                    removed_diacritic_string = ''.join(c for c in normalized_string if not unicodedata.combining(c))
+                    
                     x0 = re['coordinate']['x0']
                     y0 = re['coordinate']['y0']
                     x1 = re['coordinate']['x1']
@@ -174,7 +179,7 @@ class VehicleCameraStream(BaseCamera):
                     cv2.rectangle(img, (int(x0), int(y0)), (int(x1), int(y1)), (255, 0, 0), 2)
                     image = cv2.putText(
                         img, 
-                        re['username'], 
+                        removed_diacritic_string, 
                         (int(x0)-10, int(y0)-10), 
                         cv2.FONT_HERSHEY_SIMPLEX, 
                         1, 
@@ -200,6 +205,10 @@ class VehicleCameraStream(BaseCamera):
                     )
 
                 for re in warning:
+                    username = re['put_text']
+                    normalized_string = unicodedata.normalize('NFD', username)
+                    removed_diacritic_string = ''.join(c for c in normalized_string if not unicodedata.combining(c))
+                    
                     x0 = re['coordinate']['x0']
                     y0 = re['coordinate']['y0']
                     x1 = re['coordinate']['x1']
@@ -207,7 +216,7 @@ class VehicleCameraStream(BaseCamera):
                     cv2.rectangle(img, (int(x0), int(y0)), (int(x1), int(y1)), (0, 255, 0), 2)
                     image = cv2.putText(
                         img, 
-                        f"Warning: The owner: {re['username']}", 
+                        f"Warning: The owner: {removed_diacritic_string}", 
                         (int(x0)-10, int(y0)-10), 
                         cv2.FONT_HERSHEY_SIMPLEX, 
                         1, 
@@ -274,6 +283,9 @@ class FaceCameraStream(BaseCamera):
         
         face = self.faces[0]
         
+        if face.get('username') is None:
+            return
+        
         object = {
             'username': face['username'],
             'id_region': self.id_region,
@@ -285,7 +297,10 @@ class FaceCameraStream(BaseCamera):
         )
         
     def frames(self)->any:
-        frame = cv2.VideoCapture(0)
+        # frame = cv2.VideoCapture('rtsp://test:test@192.168.1.13:8080/h264_pcm.sdp')
+        if self.src == '0':
+            self.src = 0
+        frame = cv2.VideoCapture(self.src)
         count = 0
         count1 = 0
         plates = []
@@ -308,16 +323,18 @@ class FaceCameraStream(BaseCamera):
                     x1 = face['coordinate'][2]
                     y1 = face['coordinate'][3]
                     
-                    username = face['username']
+                    username = face['put_text']
+                    normalized_string = unicodedata.normalize('NFD', username)
+                    removed_diacritic_string = ''.join(c for c in normalized_string if not unicodedata.combining(c))
                     
                     color = (255, 0, 0)
                     if face['distance'] == -1:
                         color = (0, 0, 255)
                     
                     cv2.rectangle(img, (int(x0), int(y0)), (int(x1), int(y1)), color, 2)
-                    image = cv2.putText(
+                    cv2.putText(
                         img, 
-                        f'{username} - {self.turn}', 
+                        f'{removed_diacritic_string}', 
                         (int(x0)-10, int(y0)-10), 
                         cv2.FONT_HERSHEY_SIMPLEX, 
                         1, 

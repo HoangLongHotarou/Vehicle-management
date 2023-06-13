@@ -85,9 +85,14 @@ class FaceRecognitionController(metaclass=SingletonMeta):
         for i, obj in enumerate(objs):
             hash_username = obj.pop('hash_username')
             if hash_username:
+                user = await self.fetchAuth.get_user_by_username(hash_user_dict[hash_username])
                 obj['username'] = hash_user_dict[hash_username]
+                if user['first_name']:
+                    obj['put_text'] = f"{user['first_name']}"
+                else:
+                    obj['put_text'] = obj['username']
             else:
-                obj['username'] = 'unknown'
+                obj['put_text'] = 'unknown'
             result.append(obj)
         return result
 

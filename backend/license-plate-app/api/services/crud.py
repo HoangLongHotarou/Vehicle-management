@@ -1183,7 +1183,7 @@ class CheckExistFaceCrud(BaseCrud):
         super().__init__(f'{app}_check_face_and_plate')
 
     async def create_expire(self):
-        await self.db.mongodb[self.model].create_index('created_at', expireAfterSeconds=120)
+        await self.db.mongodb[self.model].create_index('created_at', expireAfterSeconds=1)
 
     async def add(self, data, session=None):
         await self.create_expire()

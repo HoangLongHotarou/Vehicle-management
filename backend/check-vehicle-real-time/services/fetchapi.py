@@ -24,8 +24,8 @@ class FetchYoloAPI(metaclass=SingletonMeta):
 
 class FetchFaceRecognitionAPI(metaclass=SingletonMeta):
     def __init__(self):
+        # self.url = 'http://face_recognition_service:8000/api/v1/vehicle-face-recognition'
         self.url = 'http://127.0.0.1:8005/api/v1/vehicle-face-recognition'
-        # self.url = 'http://127.0.0.1:8002/api/v1/yolo-license-plate'
     
     async def predict(self,image):
         data = aiohttp.FormData()

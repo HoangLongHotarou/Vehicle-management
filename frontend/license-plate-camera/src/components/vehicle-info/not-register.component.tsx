@@ -15,10 +15,10 @@ export default function NotRegisterInfo(props: NotRegisterInfoProps){
             <Card sx={{ minWidth: 275 }}>
                 <CardContent>
                     <Typography sx={{ mb: 1.5, color: "#8b2d2d" }}>                    
-                    Plate: {data.plate}
+                    Biển số: {data.plate}
                     </Typography>
                     <Typography sx={{ mb: 1.5, color: "#8b2d2d" }}>                    
-                    Info: {data.information}
+                    Thông tin: {data.information}
                     </Typography>
                 </CardContent>
             </Card>
