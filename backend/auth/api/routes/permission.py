@@ -6,6 +6,7 @@ router = APIRouter(prefix='/permissions',tags=['Permission'],responses={404: {'d
 async def get_all_permission():
     return [
         'get_all_user',
+        'create_account_by_admin',
         'get_user',
         'update_user',
         'delete_user',
