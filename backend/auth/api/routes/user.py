@@ -33,6 +33,21 @@ async def register_user(user: UserModel, task: BackgroundTasks):
         }
     )
 
+@router.post('/create-account')
+@check_is_staff_or_permission
+async def create_account_by_admin(
+    user: UserModel,
+    current_user=Depends(get_current_user)
+):
+    userCtrl = UserController()
+    await userCtrl.create_account(user)
+    return JSONResponse(
+        status_code=status.HTTP_201_CREATED,
+        content={
+            'detail': 'Tài khoản tạo thành công'
+        }
+    )
+
 
 @router.post('/confirm_register')
 async def confirm_register(confirmOTP: ConfirmOTP):

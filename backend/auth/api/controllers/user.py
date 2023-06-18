@@ -40,6 +40,26 @@ class UserController(metaclass=SingletonMeta):
         await self.userCrud.update(value=id, config_data=update_avatar.dict())
         return url
 
+    async def create_account(self, user: UserModel):
+        await self.userCrud.set_multi_unique()
+        checks = {}
+        check_username = await self.userCrud.get(query={'username': user.username})
+        check_email = await self.userCrud.get(query={'email': user.email})
+        check_phone_number = await self.userCrud.get(query={'phone_number': user.phone_number})
+        checks[user.username] = check_username
+        checks[user.email] = check_email
+        checks[user.phone_number] = check_phone_number
+        announce = ""
+        for key in checks:
+            if checks[key] is not None:
+                announce += f'{key} '
+        if announce != "":
+            raise HTTPException(status.HTTP_400_BAD_REQUEST,
+                                detail=f'{announce}đã tồn tại')
+        user.password = get_password_hash(user.password)
+        
+        new_user = await self.userCrud.add(user.dict())
+        await self.vehicleManagementCrud.set_student_role({"id_user":str(new_user['_id'])})
 
     async def register(self, user: UserModel, task):
         await self.userCrud.set_multi_unique()
