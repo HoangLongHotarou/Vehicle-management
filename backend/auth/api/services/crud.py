@@ -61,7 +61,7 @@ class RoleCrud(BaseCrud):
                 },
             },
         ]
-        result = await self.db.mongodb[self.model].aggregate(
+        result = self.db.mongodb[self.model].aggregate(
             pipeline
         )
         role_detail = {}
