@@ -53,7 +53,7 @@ class RoleCrud(BaseCrud):
             },
             {
                 '$lookup': {
-                    'from': 'user',
+                    'from': 'auth_user',
                     'localField': 'users',
                     'foreignField': '_id',
                     'as': 'users',
