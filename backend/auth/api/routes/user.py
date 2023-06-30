@@ -14,6 +14,7 @@ from fastapi.responses import JSONResponse
 from utils.decorators import check_is_staff, check_is_staff_or_permission
 from utils.pagination import pagination_info
 from utils.pyobjectid import PyObjectId
+import re
 
 router = APIRouter(
     prefix='/user',
@@ -114,10 +115,18 @@ async def reset_password(resetPassword: ResetPassword):
 async def get_all_user(
         page: int = Query(0, ge=0),
     limit: int = Query(20, ge=0, le=20),
+    search: str = None,
     current_user=Depends(get_current_user)
 ):
     userCtrl = UserController()
+    if search:
+        query={
+            'username': re.compile(f'{search}', re.IGNORECASE)
+        }
+    else:
+        query = {}
     users, info = await userCtrl.userCrud.get_all(
+        query,
         is_get_info=True,
         page=page,
         limit=limit
