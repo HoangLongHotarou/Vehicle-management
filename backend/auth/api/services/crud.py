@@ -67,4 +67,5 @@ class RoleCrud(BaseCrud):
         role_detail = {}
         async for data in result:
             role_detail=data
+        print(role_detail)
         return role_detail
