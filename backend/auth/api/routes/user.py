@@ -126,7 +126,7 @@ async def get_all_user(
     else:
         query = {}
     users, info = await userCtrl.userCrud.get_all(
-        query,
+        query=query,
         is_get_info=True,
         page=page,
         limit=limit
