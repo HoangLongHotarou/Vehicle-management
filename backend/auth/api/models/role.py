@@ -35,12 +35,15 @@ class UpdateRoleModel(BaseModel):
         }
         
 
-class UsernameModel(BaseModel, IDSchema):
+class UsernameModel(BaseModel):
     username: Optional[str]
+
+class UserModelOut(UsernameModel,IDSchema):
+    pass
 
 class RoleDetailModel(BaseModel):
     role: Optional[str]
-    users: Optional[UsernameModel]
+    users: Optional[List[UserModelOut]]
 
 class RoleModelOut(UpdateRoleModel,IDSchema):
     pass
