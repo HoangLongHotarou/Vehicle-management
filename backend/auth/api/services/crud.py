@@ -43,3 +43,28 @@ class RoleCrud(BaseCrud):
 
     async def push_user(self, ids_role, id_user, session):
         await self.db.mongodb[self.model].update_many({self.key: {'$in': ids_role}}, {'$push': {'users': PyObjectId(id_user)}}, session=session)
+
+    async def get_role_detail(self, id_role):
+        pipeline = [
+            {
+                '$match': {
+                    '_id': PyObjectId(id_role)
+                }
+            },
+            {
+                '$lookup': {
+                    'from': 'user',
+                    'localField': 'users',
+                    'foreignField': '_id',
+                    'as': 'users',
+                    # 'pipeline': [/
+                },
+            },
+        ]
+        result = await self.db.mongodb[self.model].aggregate(
+            pipeline
+        )
+        role_detail = {}
+        async for data in result:
+            role_detail=data
+        return role_detail

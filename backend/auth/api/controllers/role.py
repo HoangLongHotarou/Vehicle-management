@@ -14,6 +14,9 @@ class RoleController(metaclass=SingletonMeta):
         self.userCrud = UserCrud()
         self.roleCrud = RoleCrud()
 
+    async def get_role_detail(self, id_role):
+        return await self.roleCrud.get_role_detail(id_role)
+
     async def delete_role(self,id_role):
         async with await self.db.mongodb_client.start_session() as session:
             async with session.start_transaction():

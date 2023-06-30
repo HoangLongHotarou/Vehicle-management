@@ -1,5 +1,5 @@
 from api.models.role import (RoleModel, RoleModelListOut, RoleModelOut,
-                             UpdateRoleModel)
+                             UpdateRoleModel, RoleDetailModelOut)
 from core.jwt import get_current_user
 from fastapi import APIRouter, Depends, Query
 from utils.decorators import check_is_staff, check_is_staff_or_permission
@@ -25,14 +25,14 @@ async def get_all_roles(
     dict = pagination_info(roles, info)
     return dict
 
-@router.get('/{id_role}',response_model=RoleModelOut)
+@router.get('/{id_role}',response_model=RoleDetailModelOut)
 @check_is_staff_or_permission
 async def get_role(
     id_role: str,
     current_user=Depends(get_current_user)
 ):
     roleCtrl = RoleController()
-    role = await roleCtrl.roleCrud.get(value=id_role)
+    role = await roleCtrl.get_role_detail(id_role)
     return role
 
 @router.post('/',response_model=RoleModelOut)

@@ -32,8 +32,16 @@ class UpdateRoleModel(BaseModel):
                 "users":"List[str]"
             }
         }
+        
+
+class RoleDetailModel(BaseModel):
+    role: Optional[str]
+    users: Optional[any]
 
 class RoleModelOut(UpdateRoleModel,IDSchema):
+    pass
+
+class RoleDetailModelOut(RoleDetailModel, IDSchema):
     pass
 
 class RoleModelListOut(PaginationInfo):
